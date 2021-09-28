@@ -1,5 +1,5 @@
 public class NBody {
-	public static int N = 0;
+	private static int N = 0;
 	public static double readRadius(String planetsTxtPath) {
 		double R;
 		In in = new In(planetsTxtPath);
