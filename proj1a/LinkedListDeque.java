@@ -1,10 +1,10 @@
 /** Performs some basic linked list function. */
 public class LinkedListDeque<T> {
 	public class StuffNode {
-		public final T item;
-		public StuffNode prev;
-		public StuffNode next;
-		public StuffNode(T i, StuffNode p, StuffNode n) {
+		private final T item;
+		private StuffNode prev;
+		private StuffNode next;
+		private StuffNode(T i, StuffNode p, StuffNode n) {
 			item = i;
 			prev = p;
 			next = n;
