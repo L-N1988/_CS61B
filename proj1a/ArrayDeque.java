@@ -109,13 +109,17 @@ public class ArrayDeque<T> {
      * @return the first item.
      */
     public T removeFirst() {
+        int next;
+        T tmp;
+        next = front + 1;
+        next = next % aList.length;
         if (isEmpty()) {
             return null;
         }
-        T tmp = aList[front + 1];
-        aList[front + 1] = null;
-        front = front + 1;
-        front = (front < aList.length) ? front : front % aList.length;
+        // Prevent the over bound when front at length - 1.
+        tmp = aList[next];
+        aList[next] = null;
+        front = (front + 1) % aList.length;
         size = size - 1;
         return tmp;
     }
@@ -125,11 +129,15 @@ public class ArrayDeque<T> {
      * @return the last item.
      */
     public T removeLast() {
+        int prev;
+        T tmp;
+        prev = tail - 1;
+        prev = (prev < 0) ? prev + aList.length : prev;
         if (isEmpty()) {
             return null;
         }
-        T tmp = aList[tail - 1];
-        aList[tail - 1] = null;
+        tmp = aList[prev];
+        aList[prev] = null;
         tail = tail - 1;
         tail = (tail < 0) ? tail + aList.length : tail;
         size = size - 1;

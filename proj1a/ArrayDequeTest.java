@@ -79,7 +79,16 @@ public class ArrayDequeTest {
 
     public static void main(String[] args) {
         System.out.println("Running tests.\n");
-        addIsEmptySizeTest();
-        addRemoveTest();
+//        addIsEmptySizeTest();
+//        addRemoveTest();
+        ArrayDeque<Integer> lld = new ArrayDeque<>();
+        lld.addFirst(0);
+        lld.addFirst(1);
+        lld.addFirst(2);
+        lld.addFirst(3);
+        lld.addFirst(4);
+        lld.addFirst(5);
+        lld.removeFirst();
+        lld.removeFirst();
     }
 }
