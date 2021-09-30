@@ -143,7 +143,7 @@ public class ArrayDeque<T> {
         return tmp;
     }
 
-     private void downSize() {
+    private void downSize() {
         int factor = 2;
         T[] tmp = (T[]) new Object[aList.length / factor];
         if (front > tail) {
