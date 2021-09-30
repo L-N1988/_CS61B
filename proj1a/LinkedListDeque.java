@@ -36,36 +36,6 @@ public class LinkedListDeque<T> {
     }
 
     /**
-     * Constructor of deque.
-     * @param i item.
-     * @param p previous point.
-     * @param n next point.
-     */
-    public LinkedListDeque(T i, StuffNode p, StuffNode n) {
-        sentinel = new StuffNode(null, null, null);
-        sentinel.next = new StuffNode(i, sentinel, sentinel);
-        sentinel.prev = sentinel.next;
-        size = 1;
-    }
-
-    /**
-     * Constructor of deque.
-     * @param other another deque.
-     */
-    public LinkedListDeque(LinkedListDeque other) {
-        sentinel = new StuffNode(null, null, null);
-        sentinel.prev = sentinel;
-        sentinel.next = sentinel;
-
-        StuffNode ptr = other.sentinel.next;
-        while (ptr != other.sentinel) {
-            addLast(ptr.item);
-            ptr = ptr.next;
-        }
-        size = other.size();
-    }
-
-    /**
      * Return size of deque.
      * @return size of deque.
      */

@@ -83,16 +83,25 @@ public class ArrayDequeTest {
 //        addRemoveTest();
         ArrayDeque<Integer> lld = new ArrayDeque<>();
         lld.addLast(0);
-        System.out.println(lld.isEmpty());
-        lld.addLast(2);
-        lld.addLast(3);
-        lld.addLast(4);
-        lld.addLast(5);
-        lld.addLast(6);
-        lld.addLast(7);
+        lld.addLast(1);
+        lld.removeLast();
+        lld.get(0);
+        lld.removeFirst();
+        lld.addFirst(5);
+        lld.addFirst(6);
+        lld.removeFirst();
         lld.addLast(8);
-        lld.addLast(9);
-        System.out.println(lld.isEmpty());
-        System.out.println(lld.removeFirst());
+        lld.get(1);
+        lld.removeFirst();
+        lld.addFirst(11);
+        lld.addLast(12);
+        lld.addLast(13);
+        lld.addFirst(14);
+        lld.removeLast();
+        lld.removeLast();
+        lld.addFirst(17);
+        lld.removeFirst();
+        lld.addLast(19);
+        lld.get(2);
     }
 }

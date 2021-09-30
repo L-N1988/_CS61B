@@ -22,19 +22,6 @@ public class ArrayDeque<T> {
     }
 
     /**
-     * Another constructor of Array Deque.
-     * Create an Array Deque using deep copy.
-     * @param other another array deque.
-     */
-    public ArrayDeque(ArrayDeque other) {
-        size = other.size;
-        aList = (T[]) new Object[other.aList.length];
-        front = other.front;
-        tail = other.tail;
-        System.arraycopy(other.aList, 0, aList, 0, aList.length);
-    }
-
-    /**
      * Resize the array to fill new items.
      */
     private void resize() {
@@ -157,9 +144,6 @@ public class ArrayDeque<T> {
         }
         i = front + index + 1;
         i = i % aList.length;
-        if (i >= tail) {
-            return null;
-        }
         return aList[i];
     }
 }
