@@ -97,6 +97,7 @@ public class ArrayDeque<T> {
      */
     public T removeFirst() {
         int next;
+        double usage;
         T tmp;
         next = front + 1;
         next = next % aList.length;
@@ -108,6 +109,11 @@ public class ArrayDeque<T> {
         aList[next] = null;
         front = (front + 1) % aList.length;
         size = size - 1;
+        // Increase the memory usage up to 25%.
+        usage = ((double) size) / aList.length;
+        if (usage < 0.25 && aList.length >= 16) {
+            downSize();
+        }
         return tmp;
     }
 
@@ -117,6 +123,7 @@ public class ArrayDeque<T> {
      */
     public T removeLast() {
         int prev;
+        double usage;
         T tmp;
         prev = tail - 1;
         prev = (prev < 0) ? prev + aList.length : prev;
@@ -128,7 +135,28 @@ public class ArrayDeque<T> {
         tail = tail - 1;
         tail = (tail < 0) ? tail + aList.length : tail;
         size = size - 1;
+        // Increase the memory usage up to 25%.
+        usage = ((double) size) / aList.length;
+        if (usage < 0.25 && aList.length >= 16) {
+            downSize();
+        }
         return tmp;
+    }
+
+    public void downSize() {
+        int factor = 2;
+        T[] tmp = (T[]) new Object[aList.length / factor];
+        if (front > tail) {
+            System.arraycopy(aList, front, tmp, tmp.length - (aList.length - front),
+                    aList.length - front);
+            System.arraycopy(aList, 0, tmp, 0, tail + 1);
+            front = tmp.length - (aList.length - front);
+        } else {
+            System.arraycopy(aList, front, tmp, 0, tail - front + 1);
+            tail = tail - front;
+            front = 0;
+        }
+        aList = tmp;
     }
 
     /**
