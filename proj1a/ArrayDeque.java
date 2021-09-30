@@ -1,119 +1,157 @@
-import java.io.ObjectStreamException;
+/**
+ * Performs some basic array list function.
+ * @author Liu Ning
+ */
 
 public class ArrayDeque<T> {
     private int size;
-    private T[] ALList;
-    private int sentinel;
+    private T[] aList;
     private int front;
     private int tail;
 
+    /**
+     * Constructor of Array Deque class.
+     * Create an empty Array Deque.
+     * Front point to the middle of array.
+     */
     public ArrayDeque() {
         size = 0;
-        ALList = (T[]) new Object[8];
-        sentinel = 0;
-        ALList[sentinel] = null;
-        front = 0;
-        tail = 0;
+        aList = (T[]) new Object[8];
+        front = aList.length / 2;
+        tail = front + 1;
     }
 
+    /**
+     * Another constructor of Array Deque.
+     * Create an Array Deque using deep copy.
+     * @param other another array deque.
+     */
     public ArrayDeque(ArrayDeque other) {
         size = other.size;
-        ALList = (T[]) new Object[other.ALList.length];
-        sentinel = other.sentinel;
-        ALList[sentinel] = null;
+        aList = (T[]) new Object[other.aList.length];
         front = other.front;
         tail = other.tail;
-        System.arraycopy(other.ALList, 0, ALList, 0, ALList.length);
+        System.arraycopy(other.aList, 0, aList, 0, aList.length);
     }
 
+    /**
+     * Resize the array to fill new items.
+     */
     private void resize() {
-        T[] tmp = (T[]) new Object[ALList.length * 2];
-        System.arraycopy(ALList, 0, tmp, 0, tail + 1);
-        System.arraycopy(ALList, front, tmp,
-                tmp.length - (ALList.length - front), ALList.length - front);
-        front = tmp.length - (ALList.length - front);
-        ALList = tmp;
+        int factor = 2;
+        T[] tmp = (T[]) new Object[aList.length * factor];
+        System.arraycopy(aList, front, tmp, tmp.length - (aList.length - front),
+                aList.length - front);
+        System.arraycopy(aList, 0, tmp, 0, tail + 1);
+        aList = tmp;
+        front = tmp.length - (aList.length - front);
     }
 
+    /**
+     * Insert item to the front of array deque.
+     * @param item inserted item.
+     */
     public void addFirst(T item) {
+        if (front == tail) {
+            resize();
+        }
+        aList[front] = item;
+        size += 1;
         front = front - 1;
-        front = (front < 0) ? front + ALList.length : front;
-        if (front == tail && front != sentinel) {
-            /** Resize the array.
-             *  Change the front position */
-            resize();
-        }
-        ALList[front] = item;
-        size += 1;
+        front = (front < 0) ? front + aList.length : front;
     }
 
+    /**
+     * Insert item to the tail of deque array.
+     * @param item inserted item.
+     */
     public void addLast(T item) {
-        tail = tail + 1;
-        tail = (tail < ALList.length) ? tail : tail % ALList.length;
-        if (front == tail && tail != sentinel) {
-            /** Resize the array.
-             *  Change the front position */
+        if (front == tail) {
             resize();
         }
-        ALList[tail] = item;
+        aList[tail] = item;
         size += 1;
+        tail = tail + 1;
+        tail = (tail < aList.length) ? tail : tail % aList.length;
     }
 
+    /**
+     * Adjust whether the array is empty.
+     * @return true if array is empty, otherwise return false.
+     */
     public boolean isEmpty() {
-        if (size() == 0) {
-            return true;
-        }
-        return false;
+        return size() == 0;
     }
 
+    /**
+     * Return the number of existing items.
+     * @return number of items.
+     */
     public int size() {
         return size;
     }
 
+    /**
+     * Print out the whole array deque from front to tail.
+     */
     public void printDeque() {
-        int i = front;
+        int i = front + 1;
         while (i != tail) {
-            if (i == sentinel) {
-                i = i + 1;
-            }
-            System.out.print(ALList[i] + " ");
+            System.out.print(aList[i] + " ");
             i = i + 1;
-            i = (i < ALList.length) ? i : i % ALList.length;
+            i = (i < aList.length) ? i : i % aList.length;
         }
         System.out.print("\n");
     }
 
+    /**
+     * Remove the first item of array deque.
+     * @return the first item.
+     */
     public T removeFirst() {
-        if (front == sentinel) {
+        if (isEmpty()) {
             return null;
         }
-        T tmp = ALList[front];
+        T tmp = aList[front + 1];
+        aList[front + 1] = null;
         front = front + 1;
-        front = (front < ALList.length) ? front : front % ALList.length;
+        front = (front < aList.length) ? front : front % aList.length;
         size = size - 1;
         return tmp;
     }
 
+    /**
+     * Remove the Last item of array deque.
+     * @return the last item.
+     */
     public T removeLast() {
-        if (tail == sentinel) {
+        if (isEmpty()) {
             return null;
         }
-        T tmp = ALList[tail];
+        T tmp = aList[tail - 1];
+        aList[tail - 1] = null;
         tail = tail - 1;
+        tail = (tail < 0) ? tail + aList.length : tail;
         size = size - 1;
         return tmp;
     }
 
+    /**
+     * Get the index_th item in the array deque.
+     * If index too big, return null.
+     * @param index the i_th item's position.
+     * @return the i_th item.
+     */
     public T get(int index) {
         int i;
-        if (front == sentinel && tail == sentinel) {
+        if (isEmpty()) {
             return null;
         }
-        i = front + index;
-        i = (i < ALList.length) ? i : i % ALList.length + 1;
-        if (i > tail) {
+        i = front + index + 1;
+        i = (i < aList.length) ? i : i % aList.length;
+        if (i >= tail) {
             return null;
         }
-        return ALList[i];
+        return aList[i];
     }
 }
