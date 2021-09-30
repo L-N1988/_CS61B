@@ -43,8 +43,8 @@ public class ArrayDeque<T> {
         System.arraycopy(aList, front, tmp, tmp.length - (aList.length - front),
                 aList.length - front);
         System.arraycopy(aList, 0, tmp, 0, tail + 1);
-        aList = tmp;
         front = tmp.length - (aList.length - front);
+        aList = tmp;
     }
 
     /**
@@ -156,7 +156,7 @@ public class ArrayDeque<T> {
             return null;
         }
         i = front + index + 1;
-        i = (i < aList.length) ? i : i % aList.length;
+        i = i % aList.length;
         if (i >= tail) {
             return null;
         }
