@@ -15,7 +15,6 @@ public class TestPalindrome {
         }
         assertEquals("persiflage", actual);
     }
-    // Uncomment this class once you've created your Palindrome class.
 
     @Test
     public void testisPalindrome() {

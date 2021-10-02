@@ -2,7 +2,7 @@
  * Performs some basic array list function.
  * @author Liu Ning
  */
-public class ArrayDeque<T> implements Deque<T>{
+public class ArrayDeque<T> implements Deque<T> {
     private int size;
     private T[] aList;
     private int front;
