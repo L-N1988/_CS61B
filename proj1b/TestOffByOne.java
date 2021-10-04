@@ -16,4 +16,9 @@ public class TestOffByOne {
         assertFalse(offByOne.equalChars('a', 'a'));  // false
         assertTrue(offByOne.equalChars('&', '%'));
     }
+
+    /* Run the unit tests in this file. */
+    public static void main(String... args) {        
+        jh61b.junit.TestRunner.runTests("all", TestOffByOne.class);
+    }
 }

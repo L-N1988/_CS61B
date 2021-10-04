@@ -10,4 +10,9 @@ public class TestOffByN {
         assertTrue(offBy5.equalChars('f', 'a'));
         assertFalse(offBy5.equalChars('f', 'h'));
     }
+
+    /* Run the unit tests in this file. */
+    public static void main(String... args) {        
+        jh61b.junit.TestRunner.runTests("all", TestOffByN.class);
+    }
 }

@@ -32,4 +32,9 @@ public class TestPalindrome {
         assertTrue(palindrome.isPalindrome("a", cc));
         assertTrue(palindrome.isPalindrome("&a%", cc));
     }
+
+    /* Run the unit tests in this file. */
+    public static void main(String... args) {        
+        jh61b.junit.TestRunner.runTests("all", TestPalindrome.class);
+    }
 }
