@@ -27,7 +27,7 @@ public class TestArrayDequeGold {
                         if (message == null) {
                             message = "removeFirst()\n";
                         } else {
-                            message = "removeFirst()\n" + message;
+                            message =  message + "removeFirst()\n";
                         }
                         assertEquals(expected, actual);
                     }
@@ -37,7 +37,7 @@ public class TestArrayDequeGold {
                     if (message == null) {
                         message = "addFirst(" + i + ")\n";
                     } else {
-                        message = "addFirst(" + i + ")\n" + message;
+                        message = message + "addFirst(" + i + ")\n";
                     }
                     assertEquals(ads.get(0), sad.get(0));
                 }
@@ -49,7 +49,7 @@ public class TestArrayDequeGold {
                         if (message == null) {
                             message = "removeLast()\n";
                         } else {
-                            message = "removeLast()\n" + message;
+                            message = message + "removeLast()\n";
                         }
                         assertEquals(message, expected, actual); // ******
                     }
@@ -59,19 +59,11 @@ public class TestArrayDequeGold {
                     if (message == null) {
                         message = "addLast(" + i +")";
                     } else{
-                        message = "addLast(" + i + ")\n" + message;
+                        message = message + "addLast(" + i + ")\n";
                     }
                     assertEquals(message, ads.get(ads.size() - 1), sad.get(sad.size() - 1)); // *******
                 }
             }
         }
-        // System.out.print("Student deque: ");
-        // sad.printDeque();
-        // System.out.print("Standard deque: ");
-        // // ads.printDeque();
-        // // how does the java find the first item position?
-        // for (Integer item : ads) {
-        //     System.out.print(item + " ");
-        // }
     }
 }
