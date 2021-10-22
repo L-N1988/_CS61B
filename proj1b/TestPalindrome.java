@@ -8,7 +8,8 @@ public class TestPalindrome {
 
     @Test
     public void testWordToDeque() {
-        Deque d = palindrome.wordToDeque("persiflage");
+        Deque<Character> d = new ArrayDeque<>();
+        d = palindrome.wordToDeque("persiflage");
         String actual = "";
         for (int i = 0; i < "persiflage".length(); i++) {
             actual += d.removeFirst();
@@ -27,7 +28,7 @@ public class TestPalindrome {
 
     @Test
     public void testIsPalindrome() {
-        OffByOne cc = new OffByOne();
+        CharacterComparator cc = new OffByOne();
         assertTrue(palindrome.isPalindrome("flake", cc));
         assertTrue(palindrome.isPalindrome("a", cc));
         assertTrue(palindrome.isPalindrome("&a%", cc));

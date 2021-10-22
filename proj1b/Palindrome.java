@@ -1,6 +1,6 @@
 public class Palindrome {
     public Deque<Character> wordToDeque(String word) {
-        Deque d = new ArrayDeque();
+        Deque<Character> d = new ArrayDeque<>();
         int i;
         for (i = 0; i < word.length(); i++) {
             d.addLast(word.charAt(i));
@@ -9,11 +9,11 @@ public class Palindrome {
     }
 
     public boolean isPalindrome(String word) {
-        int i;
-        int j;
-        for (i = 0; i < word.length() / 2; i++) {
-            j = word.length() - 1 - i;
-            if (word.charAt(j) != word.charAt(i)) {
+        Palindrome palindrome = new Palindrome();
+        Deque<Character> d = new ArrayDeque<>();
+        d = palindrome.wordToDeque(word);
+        while (d.size() != 0 && d.size() != 1) {
+            if (d.removeFirst() != d.removeLast()) {
                 return false;
             }
         }
@@ -21,10 +21,11 @@ public class Palindrome {
     }
 
     public boolean isPalindrome(String word, CharacterComparator cc) {
-        int i, j;
-        for (i = 0; i < word.length() / 2; i++) {
-            j = word.length() - 1 - i;
-            if (!cc.equalChars(word.charAt(i), word.charAt(j)) && i != j) {
+        Palindrome palindrome = new Palindrome();
+        Deque<Character> d = new ArrayDeque<>();
+        d = palindrome.wordToDeque(word);
+        while (d.size() != 0 && d.size() != 1) {
+            if (!cc.equalChars(d.removeFirst(), d.removeLast())) {
                 return false;
             }
         }
