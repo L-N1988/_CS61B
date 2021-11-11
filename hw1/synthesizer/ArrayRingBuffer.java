@@ -57,7 +57,7 @@ public class ArrayRingBuffer<T> extends AbstractBoundedQueue<T>  {
         T returnItem = rb[first];
         first += 1;
         first = (first < this.capacity) ? first : first % this.capacity;
-        fillCount += 1;
+        fillCount -= 1;
         return returnItem;
     }
 
