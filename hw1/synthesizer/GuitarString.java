@@ -18,7 +18,7 @@ public class GuitarString {
         //       cast the result of this division operation into an int. For better
         //       accuracy, use the Math.round() function before casting.
         //       Your buffer should be initially filled with zeros.
-        buffer = new ArrayRingBuffer<Double>((int)Math.round(SR / frequency));
+        buffer = new ArrayRingBuffer<Double>((int) Math.round(SR / frequency));
     }
 
 
