@@ -43,7 +43,7 @@ public class GuitarPlayer {
         vol = new double[128];
         for (int i = 0; i < strings.length; i++) {
             strings[i] = new GuitarString(440.0 * Math.pow(2.0, (i - 69.0) / 12.0));
-            vol[i] = 2.0;
+            vol[i] = 0.0;
         }
     }
 
@@ -58,7 +58,9 @@ public class GuitarPlayer {
     private double sample() {
         double sum = 0.0f;
         for (int i = 0; i < strings.length; i++) {
-            sum += vol[i] * strings[i].sample();
+            if (vol[i] > 0) {
+                sum += vol[i] * strings[i].sample();
+            }
         }
         return sum;
     }
@@ -132,6 +134,7 @@ public class GuitarPlayer {
                     int vel = data[j++] & 0xFF;
                     vol[note] = vel / 127.0;
                     strings[note].pluck();
+                    vol[note] = 2.0;
                 } else {
                     // status
                     int d = data[j++] & 0xFF;
