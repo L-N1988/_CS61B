@@ -20,7 +20,6 @@ public class TestArrayRingBuffer {
         assertEquals(44.8, arb.dequeue()); // 44.8 62.3 -3.4  null (returns 33.1)
         assertEquals(62.3, arb.dequeue()); // 44.8 62.3 -3.4  null (returns 33.1)
         assertEquals(-3.4, arb.dequeue()); // 44.8 62.3 -3.4  null (returns 33.1)
-        arb.dequeue(); // 44.8 62.3 -3.4  null (returns 33.1)
     }
 
     /** Calls tests for ArrayRingBuffer. */

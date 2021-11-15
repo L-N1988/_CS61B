@@ -4,11 +4,11 @@ import synthesizer.GuitarString;
 public class GuitarHero {
     private static final double CONCERT_A = 440.0;
     private static final int NUM_KEY = 37;
-    private static final String keyboard = "q2we4r5ty7u8i9op-[=zxdcfvgbnjmk,.;/' ";
+    private static String keyboard = "q2we4r5ty7u8i9op-[=zxdcfvgbnjmk,.;/' ";
     private GuitarString[] myPiano = new GuitarString[NUM_KEY];
     private double[] vol = new double[NUM_KEY];
 
-    public GuitarHero () {
+    public GuitarHero() {
         for (int i = 0; i < keyboard.length(); i += 1) {
             myPiano[i] = new GuitarString(CONCERT_A * Math.pow(2, (i - 24) / 12));
             vol[i] = 2.0;
