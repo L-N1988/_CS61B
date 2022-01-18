@@ -2,9 +2,6 @@ package byog.Core;
 
 import byog.TileEngine.TERenderer;
 import byog.TileEngine.TETile;
-import byog.TileEngine.Tileset;
-
-import java.util.Random;
 
 public class Game {
     TERenderer ter = new TERenderer();
@@ -35,24 +32,7 @@ public class Game {
         // and return a 2D tile representation of the world that would have been
         // drawn if the same inputs had been given to playWithKeyboard().
 
-        TETile[][] finalWorldFrame = new TETile[WIDTH][HEIGHT];
-        MapGenerator(finalWorldFrame, 689);
+        TETile[][] finalWorldFrame = null;
         return finalWorldFrame;
-    }
-
-    /**
-     * generator the origin map shape.
-     */
-    private void MapGenerator(TETile[][] frame, int seed) {
-        Random myRand = new Random(seed);
-        for (int i = 0; i < WIDTH; i++) {
-            int tileW = myRand.nextInt(5);
-            int tileH = myRand.nextInt(HEIGHT / 2);
-            for (int x = i; x < i + tileW && x < WIDTH; x++) {
-                for (int y = 0; y < tileH && y < HEIGHT; y++) {
-                    frame[x][y] = Tileset.WALL;
-                }
-            }
-        }
     }
 }
