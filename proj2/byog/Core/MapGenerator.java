@@ -7,7 +7,7 @@ import java.util.Random;
 import java.util.LinkedList;
 
 public class MapGenerator {
-    private static class Position {
+    static class Position {
         int x;
         int y;
 
