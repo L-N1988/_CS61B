@@ -107,12 +107,20 @@ public class MapGenerator {
         Position nextPos = null;
         int randDir = RANDOM.nextInt(4);
         switch (randDir) {
-            case 0 -> nextPos = new Position(curPos.x, curPos.y + 2);
-            case 1 -> nextPos = new Position(curPos.x, curPos.y - 2);
-            case 2 -> nextPos = new Position(curPos.x - 2, curPos.y);
-            case 3 -> nextPos = new Position(curPos.x + 2, curPos.y);
-            default -> {
-            }
+            case 0:
+                nextPos = new Position(curPos.x, curPos.y + 2);
+                break;
+            case 1:
+                nextPos = new Position(curPos.x, curPos.y - 2);
+                break;
+            case 2:
+                nextPos = new Position(curPos.x - 2, curPos.y);
+                break;
+            case 3:
+                nextPos = new Position(curPos.x + 2, curPos.y);
+                break;
+            default:
+                break;
         }
         if (inRoom(nextPos, new Room(new Position(4, 4), Game.WIDTH - 10, Game.HEIGHT - 10))
                 && !visited[nextPos.x][nextPos.y]) {

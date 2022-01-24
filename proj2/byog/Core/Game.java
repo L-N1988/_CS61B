@@ -1,6 +1,5 @@
 package byog.Core;
 
-import byog.SaveDemo.World;
 import byog.TileEngine.TERenderer;
 import byog.TileEngine.TETile;
 import byog.TileEngine.Tileset;
@@ -48,24 +47,29 @@ public class Game {
                 world[org.x][org.y] = Tileset.FLOOR;
                 char c = StdDraw.nextKeyTyped();
                 switch (c) {
-                    case 'q', 'Q' -> {
+                    case 'q':
+                    case 'Q':
                         saveWorld(world);
                         System.exit(0);
-                    }
-                    case 'w', 'W' -> {
-                        org = goUP(world, org);
-                    }
-                    case 's', 'S' -> {
+                        break;
+                    case 'w':
+                    case 'W':
+                       org = goUP(world, org);
+                       break;
+                    case 's':
+                    case 'S':
                         org = goDown(world, org);
-                    }
-                    case 'l', 'L' -> {
+                        break;
+                    case 'l':
+                    case 'L':
                         org = goLeft(world, org);
-                    }
-                    case 'r', 'R' -> {
+                        break;
+                    case 'r':
+                    case 'R':
                         org = goRight(world, org);
-                    }
-                    default -> {
-                    }
+                        break;
+                    default:
+                        break;
                 }
             }
             // set next step play position.
@@ -160,12 +164,24 @@ public class Game {
             // clear previous player location.
             orgMap[org.x][org.y] = Tileset.FLOOR;
             switch (steps.charAt(i)) {
-                case 'w', 'W' -> org = goUP(orgMap, org);
-                case 's', 'S' -> org = goDown(orgMap, org);
-                case 'a', 'A' -> org = goLeft(orgMap, org);
-                case 'd', 'D' -> org = goRight(orgMap, org);
-                default -> {
-                }
+                case 'w':
+                case 'W':
+                    org = goUP(orgMap, org);
+                    break;
+                case 's':
+                case 'S':
+                    org = goDown(orgMap, org);
+                    break;
+                case 'a':
+                case 'A':
+                    org = goLeft(orgMap, org);
+                    break;
+                case 'd':
+                case 'D':
+                    org = goRight(orgMap, org);
+                    break;
+                default:
+                    break;
             }
             orgMap[org.x][org.y] = Tileset.PLAYER;
         }
