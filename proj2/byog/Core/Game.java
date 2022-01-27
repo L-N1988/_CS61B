@@ -143,17 +143,11 @@ public class Game {
      * @return the 2D TETile[][] representing the state of the world
      */
     public TETile[][] playWithInputString(String input) {
-        // initialize the tile rendering engine with a window of size WIDTH x HEIGHT
-        TERenderer ter = new TERenderer();
-        ter.initialize(Game.WIDTH, Game.HEIGHT);
-
         int i = getSEED(input);
         TETile[][] orgMap = mapGen(Long.parseLong(input.substring(1, i)));
         if (i != input.length() - 1) {
             nextSteps(orgMap, input.substring(i + 1));
         }
-        // draws the world to the screen
-        ter.renderFrame(orgMap);
         return orgMap;
     }
 

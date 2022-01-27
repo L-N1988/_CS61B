@@ -98,6 +98,7 @@ public class MapGenerator {
         boolean[][] visited = new boolean[Game.WIDTH][Game.HEIGHT];
         dfsHallway(posList, world, origin, visited, random);
         world[origin.x][origin.y] = Tileset.PLAYER;
+        world[origin.x + 1][origin.y + 1] = Tileset.LOCKED_DOOR;
     }
 
     private static void dfsHallway(LinkedList<Position> posList, TETile[][] world,
