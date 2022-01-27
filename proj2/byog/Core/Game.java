@@ -5,7 +5,13 @@ import byog.TileEngine.TETile;
 import byog.TileEngine.Tileset;
 import edu.princeton.cs.introcs.StdDraw;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.ObjectInputStream;
+import java.io.IOException;
+import java.io.FileOutputStream;
+import java.io.ObjectOutputStream;
 
 public class Game {
     /* Feel free to change the width and height. */
@@ -54,8 +60,8 @@ public class Game {
                         break;
                     case 'w':
                     case 'W':
-                       org = goUP(world, org);
-                       break;
+                        org = goUP(world, org);
+                        break;
                     case 's':
                     case 'S':
                         org = goDown(world, org);
@@ -82,7 +88,7 @@ public class Game {
         long seed = 0;
         while (StdDraw.hasNextKeyTyped()
                 && (StdDraw.nextKeyTyped() != 's' || StdDraw.nextKeyTyped() != 'S')) {
-            seed = seed * 10 + (long)StdDraw.nextKeyTyped();
+            seed = seed * 10 + (long) StdDraw.nextKeyTyped();
         }
         return seed;
     }
