@@ -5,7 +5,8 @@ import byog.TileEngine.TETile;
 import byog.TileEngine.Tileset;
 import edu.princeton.cs.introcs.StdDraw;
 
-import java.awt.*;
+import java.awt.Color;
+import java.awt.Font;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -32,7 +33,7 @@ public class Game {
         drawGreeter();
         world = readInWorld();
         ter.initialize(WIDTH, HEIGHT);
-        org = findOrg(world);
+        org = findPlayer(world);
         ter.renderFrame(world);
         drawProcess(ter, world, org);
     }
@@ -58,11 +59,13 @@ public class Game {
     }
 
     private void drawProcess(TERenderer ter, TETile[][] world, MapGenerator.Position org) {
+        StringBuilder s = new StringBuilder();
         while (true) {
             if (StdDraw.hasNextKeyTyped()) {
                 // clear previous player location.
                 world[org.x][org.y] = Tileset.FLOOR;
                 char c = StdDraw.nextKeyTyped();
+                s.append(c);
                 switch (c) {
                     case 'q':
                     case 'Q':
@@ -94,15 +97,48 @@ public class Game {
             // set next step play position.
             world[org.x][org.y] = Tileset.PLAYER;
             drawHUD(world);
-            ter.renderFrame(world);
+            //  Add some neat easter eggs or cheat codes to your game which do something fun.
+            // type in string "adads" will show all map for seconds.
+            if (s.length() > 4
+                    && s.substring(s.length() - 5).equals("adads")) {
+                ter.renderFrame(world);
+                StdDraw.pause(1000);
+                // insert a meaningless character
+                // to avoid re-enter if statement many times.
+                s.append('o');
+            }
+            blindSight(world);
         }
     }
 
+    /*
+     * Create a system so that the game only displays tiles on the screen
+     * that are within the line of sight of the player
+     */
+    private void blindSight(TETile[][] world) {
+        MapGenerator.Position playerPos = findPlayer(world);
+        int sightRad = 8;
+        for (int i = 0; i < WIDTH; i++) {
+            for (int j = 0; j < HEIGHT; j++) {
+                if (i > playerPos.x - sightRad && i < playerPos.x + sightRad
+                        && j > playerPos.y - sightRad && j < playerPos.y + sightRad) {
+                    world[i][j].draw(i, j);
+                } else {
+                    Tileset.NOTHING.draw(i, j);
+                }
+            }
+        }
+        StdDraw.show();
+    }
+
+    /*
+     * display head up message about tiles.
+     */
     private void drawHUD(TETile[][] world) {
         StdDraw.setPenColor(Color.WHITE);
         double x = StdDraw.mouseX();
         double y = StdDraw.mouseY();
-        if (x < 0 || x > WIDTH || y < 0 || y >HEIGHT) {
+        if (x < 0 || x >= WIDTH || y < 0 || y >= HEIGHT) {
             return;
         }
         if (world[(int) x][(int) y].equals(Tileset.FLOOR)) {
@@ -159,7 +195,7 @@ public class Game {
 
         StdDraw.text((double) WIDTH / 2, (double) HEIGHT / 2, "New Game (N)");
         StdDraw.text((double) WIDTH / 2, (double) HEIGHT / 2 - 2, "Load Game (L)");
-        StdDraw.text((double) WIDTH / 2, (double) HEIGHT / 2 -4, "Quit (Q)");
+        StdDraw.text((double) WIDTH / 2, (double) HEIGHT / 2 - 4, "Quit (Q)");
         StdDraw.show();
     }
 
@@ -216,7 +252,7 @@ public class Game {
     }
 
     private void nextSteps(TETile[][] orgMap, String steps) {
-        MapGenerator.Position org =  findOrg(orgMap);
+        MapGenerator.Position org =  findPlayer(orgMap);
         for (int i = 0; i < steps.length(); i++) {
             if (steps.charAt(i) == 'q' || steps.charAt(i) == 'Q') {
                 saveWorld(orgMap);
@@ -226,7 +262,7 @@ public class Game {
                 continue;
             } else if (steps.charAt(i) == 'l' || steps.charAt(i) == 'L') {
                 orgMap = loadWorld();
-                org = findOrg(orgMap);
+                org = findPlayer(orgMap);
             }
             // clear previous player location.
             orgMap[org.x][org.y] = Tileset.FLOOR;
@@ -305,7 +341,7 @@ public class Game {
         }
     }
 
-    private MapGenerator.Position findOrg(TETile[][] orgMap) {
+    private MapGenerator.Position findPlayer(TETile[][] orgMap) {
         for (int i = 0; i < WIDTH; i++) {
             for (int j = 0; j < HEIGHT; j++) {
                 if (orgMap[i][j].equals(Tileset.PLAYER)) {
