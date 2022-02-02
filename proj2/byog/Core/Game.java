@@ -5,6 +5,7 @@ import byog.TileEngine.TETile;
 import byog.TileEngine.Tileset;
 import edu.princeton.cs.introcs.StdDraw;
 
+import java.awt.Font;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -22,28 +23,38 @@ public class Game {
      * Method used for playing a fresh game. The game should start from the main menu.
      */
     public void playWithKeyboard() {
-        StdDraw.enableDoubleBuffering();
         // initialize the tile rendering engine with a window of size WIDTH x HEIGHT
         TERenderer ter = new TERenderer();
         ter.initialize(WIDTH, HEIGHT);
-
-        TETile[][] world = null;
+        TETile[][] world;
         MapGenerator.Position org;
-        drawGreeter();
 
-        if (StdDraw.hasNextKeyTyped()) {
-            char c = StdDraw.nextKeyTyped();
-            if (c == 'l' || c == 'L') {
-                world = loadWorld();
-            } else if (c == 'n' || c == 'N') {
-                world = mapGen(readInSEED());
-            } else if (c == 'q' || c == 'Q') {
-                System.exit(0);
-            }
-        }
+        drawGreeter();
+        world = readInWorld();
+        ter.initialize(WIDTH, HEIGHT);
         org = findOrg(world);
         ter.renderFrame(world);
         drawProcess(ter, world, org);
+    }
+
+    private TETile[][] readInWorld() {
+        TETile[][] world;
+
+        while (true) {
+            if (StdDraw.hasNextKeyTyped()) {
+                char c = StdDraw.nextKeyTyped();
+                if (c == 'l' || c == 'L') {
+                    world = loadWorld();
+                    break;
+                } else if (c == 'n' || c == 'N') {
+                    world = mapGen(readInSEED());
+                    break;
+                } else if (c == 'q' || c == 'Q') {
+                    System.exit(0);
+                }
+            }
+        }
+        return world;
     }
 
     private void drawProcess(TERenderer ter, TETile[][] world, MapGenerator.Position org) {
@@ -55,6 +66,8 @@ public class Game {
                 switch (c) {
                     case 'q':
                     case 'Q':
+                        // do not clear player's position before save world map.
+                        world[org.x][org.y] = Tileset.PLAYER;
                         saveWorld(world);
                         System.exit(0);
                         break;
@@ -66,12 +79,12 @@ public class Game {
                     case 'S':
                         org = goDown(world, org);
                         break;
-                    case 'l':
-                    case 'L':
+                    case 'a':
+                    case 'A':
                         org = goLeft(world, org);
                         break;
-                    case 'r':
-                    case 'R':
+                    case 'd':
+                    case 'D':
                         org = goRight(world, org);
                         break;
                     default:
@@ -85,27 +98,51 @@ public class Game {
     }
 
     private long readInSEED() {
+        // initialize some original frame variable.
+        StdDraw.clear(StdDraw.BLACK);
+        Font smallFont = new Font("Monaco", Font.BOLD, 30);
+        StdDraw.setFont(smallFont);
+
         long seed = 0;
-        while (StdDraw.hasNextKeyTyped()
-                && (StdDraw.nextKeyTyped() != 's' || StdDraw.nextKeyTyped() != 'S')) {
-            seed = seed * 10 + (long) StdDraw.nextKeyTyped();
+        StringBuilder s = new StringBuilder();
+        while (true) {
+            if (StdDraw.hasNextKeyTyped()) {
+                StdDraw.clear(StdDraw.BLACK);
+                StdDraw.setPenColor(StdDraw.WHITE);
+                char c = StdDraw.nextKeyTyped();
+                if (c == 's' || c == 'S') {
+                    break;
+                }
+                seed = seed * 10 + (long) c - 48;
+                s.append(c);
+                StdDraw.text((double) WIDTH / 2, (double) HEIGHT / 2, "Your input seed: ");
+                StdDraw.text((double) WIDTH / 2, (double) HEIGHT / 2 - 2, s.toString());
+                StdDraw.show();
+            }
         }
         return seed;
     }
 
 
-    private static void drawGreeter() {
+    private void drawGreeter() {
         StdDraw.clear(StdDraw.BLACK);
         StdDraw.setPenColor(StdDraw.WHITE);
-        StdDraw.text(0.5, 0.8, "Press a to add square.");
-        StdDraw.text(0.5, 0.85, "Press q to quit and save.");
-        StdDraw.text(0.5, 0.9, "Delete world.ser to go back to a blank canvas.");
+
+        Font bigFont = new Font("Monaco", Font.BOLD, 40);
+        StdDraw.setFont(bigFont);
+        StdDraw.text((double) WIDTH / 2, (double) HEIGHT * 3 / 4, "CS61B: THE GAME");
+
+        Font smallFont = new Font("Monaco", Font.BOLD, 30);
+        StdDraw.setFont(smallFont);
+
+        StdDraw.text((double) WIDTH / 2, (double) HEIGHT / 2, "New Game (N)");
+        StdDraw.text((double) WIDTH / 2, (double) HEIGHT / 2 - 2, "Load Game (L)");
+        StdDraw.text((double) WIDTH / 2, (double) HEIGHT / 2 -4, "Quit (Q)");
         StdDraw.show();
-        StdDraw.pause(100);
     }
 
     private static TETile[][] loadWorld() {
-        File f = new File("./world.ser");
+        File f = new File("./CS61BGameMap.ser");
         if (f.exists()) {
             try {
                 FileInputStream fs = new FileInputStream(f);
@@ -143,11 +180,20 @@ public class Game {
      * @return the 2D TETile[][] representing the state of the world
      */
     public TETile[][] playWithInputString(String input) {
+        TETile[][] orgMap;
         int i = getSEED(input);
-        TETile[][] orgMap = mapGen(Long.parseLong(input.substring(1, i)));
+        if (input.charAt(0) == 'l' || input.charAt(0) == 'L') {
+            orgMap = loadWorld();
+        } else {
+            orgMap = mapGen(Long.parseLong(input.substring(1, i)));
+        }
         if (i != input.length() - 1) {
             nextSteps(orgMap, input.substring(i + 1));
         }
+        // initialize the tile rendering engine with a window of size WIDTH x HEIGHT
+        TERenderer ter = new TERenderer();
+        ter.initialize(WIDTH, HEIGHT);
+        ter.renderFrame(orgMap);
         return orgMap;
     }
 
@@ -160,6 +206,9 @@ public class Game {
                 break;
             } else if (steps.charAt(i) == ':') {
                 continue;
+            } else if (steps.charAt(i) == 'l' || steps.charAt(i) == 'L') {
+                orgMap = loadWorld();
+                org = findOrg(orgMap);
             }
             // clear previous player location.
             orgMap[org.x][org.y] = Tileset.FLOOR;
@@ -188,7 +237,7 @@ public class Game {
     }
 
     private void saveWorld(TETile[][] w) {
-        File f = new File("./worldMap.ser");
+        File f = new File("./CS61BGameMap.ser");
         try {
             if (!f.exists()) {
                 f.createNewFile();
@@ -207,7 +256,7 @@ public class Game {
     }
 
     private MapGenerator.Position goRight(TETile[][] orgMap, MapGenerator.Position org) {
-        if (orgMap[org.x + 1][org.y].equals(Tileset.WALL)) {
+        if (!orgMap[org.x + 1][org.y].equals(Tileset.FLOOR)) {
             return org;
         } else {
             return new MapGenerator.Position(org.x + 1, org.y);
@@ -215,7 +264,7 @@ public class Game {
     }
 
     private MapGenerator.Position goLeft(TETile[][] orgMap, MapGenerator.Position org) {
-        if (orgMap[org.x - 1][org.y].equals(Tileset.WALL)) {
+        if (!orgMap[org.x - 1][org.y].equals(Tileset.FLOOR)) {
             return org;
         } else {
             return new MapGenerator.Position(org.x - 1, org.y);
@@ -223,7 +272,7 @@ public class Game {
     }
 
     private MapGenerator.Position goDown(TETile[][] orgMap, MapGenerator.Position org) {
-        if (orgMap[org.x][org.y - 1].equals(Tileset.WALL)) {
+        if (!orgMap[org.x][org.y - 1].equals(Tileset.FLOOR)) {
             return org;
         } else {
             return new MapGenerator.Position(org.x, org.y - 1);
@@ -231,7 +280,7 @@ public class Game {
     }
 
     private MapGenerator.Position goUP(TETile[][] orgMap, MapGenerator.Position org) {
-        if (orgMap[org.x][org.y + 1].equals(Tileset.WALL)) {
+        if (!orgMap[org.x][org.y + 1].equals(Tileset.FLOOR)) {
             return org;
         } else {
             return new MapGenerator.Position(org.x, org.y + 1);

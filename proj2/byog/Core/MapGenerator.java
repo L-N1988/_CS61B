@@ -130,18 +130,19 @@ public class MapGenerator {
             posList.addLast(nextPos);
             curPos = nextPos;
         } else {
+            // pop out the current point position.
+            posList.removeLast();
             while (!posList.isEmpty()) {
                 Position prevPos = posList.getLast();
-                posList.removeLast();
                 world[curPos.x][curPos.y] = Tileset.FLOOR;
-                if (!isDeadEnd(prevPos, visited)) {
-                    posList.addLast(prevPos);
-                    curPos = prevPos;
+                if (!isDeadEnd(curPos, visited)) {
+                    posList.addLast(curPos);
                     break;
                 }
                 world[prevPos.x][prevPos.y] = Tileset.FLOOR;
                 world[(curPos.x + prevPos.x) / 2][(curPos.y + prevPos.y) / 2] = Tileset.FLOOR;
                 curPos = prevPos;
+                posList.removeLast();
             }
         }
         dfsHallway(posList, world, curPos, visited, random);
