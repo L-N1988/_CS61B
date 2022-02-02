@@ -291,7 +291,7 @@ public class Game {
     }
 
     private void saveWorld(TETile[][] w) {
-        File f = new File("./CS61BGameMap.ser");
+        File f = new File("./world.ser");
         try {
             if (!f.exists()) {
                 f.createNewFile();
