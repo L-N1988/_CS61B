@@ -200,7 +200,7 @@ public class Game {
     }
 
     private static TETile[][] loadWorld() {
-        File f = new File("./CS61BGameMap.ser");
+        File f = new File("./world.ser");
         if (f.exists()) {
             try {
                 FileInputStream fs = new FileInputStream(f);
