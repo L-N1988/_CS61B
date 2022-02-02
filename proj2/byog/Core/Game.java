@@ -5,7 +5,7 @@ import byog.TileEngine.TETile;
 import byog.TileEngine.Tileset;
 import edu.princeton.cs.introcs.StdDraw;
 
-import java.awt.Font;
+import java.awt.*;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -93,8 +93,30 @@ public class Game {
             }
             // set next step play position.
             world[org.x][org.y] = Tileset.PLAYER;
+            drawHUD(world);
             ter.renderFrame(world);
         }
+    }
+
+    private void drawHUD(TETile[][] world) {
+        StdDraw.setPenColor(Color.WHITE);
+        double x = StdDraw.mouseX();
+        double y = StdDraw.mouseY();
+        if (x < 0 || x > WIDTH || y < 0 || y >HEIGHT) {
+            return;
+        }
+        if (world[(int) x][(int) y].equals(Tileset.FLOOR)) {
+            StdDraw.text(3, HEIGHT - 3, "Floor");
+        } else if (world[(int) x][(int) y].equals(Tileset.PLAYER)) {
+            StdDraw.text(3, HEIGHT - 3, "Player");
+        } else if (world[(int) x][(int) y].equals(Tileset.LOCKED_DOOR)) {
+            StdDraw.text(3, HEIGHT - 3, "Locked door");
+        } else if (world[(int) x][(int) y].equals(Tileset.NOTHING)) {
+            StdDraw.text(3, HEIGHT - 3, "Nothing");
+        } else if (world[(int) x][(int) y].equals(Tileset.WALL)) {
+            StdDraw.text(3, HEIGHT - 3, "Wall");
+        }
+        StdDraw.show();
     }
 
     private long readInSEED() {
@@ -190,10 +212,6 @@ public class Game {
         if (i != input.length() - 1) {
             nextSteps(orgMap, input.substring(i + 1));
         }
-        // initialize the tile rendering engine with a window of size WIDTH x HEIGHT
-        TERenderer ter = new TERenderer();
-        ter.initialize(WIDTH, HEIGHT);
-        ter.renderFrame(orgMap);
         return orgMap;
     }
 
