@@ -16,10 +16,6 @@ public class Main {
             Game game = new Game();
             TETile[][] worldState = game.playWithInputString(args[0]);
             System.out.println(TETile.toString(worldState));
-            // initialize the tile rendering engine with a window of size WIDTH x HEIGHT
-            TERenderer ter = new TERenderer();
-            ter.initialize(Game.WIDTH, Game.HEIGHT);
-            ter.renderFrame(worldState);
 
         } else {
             Game game = new Game();
