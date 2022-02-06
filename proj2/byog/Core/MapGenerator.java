@@ -48,8 +48,6 @@ public class MapGenerator {
         generateHallway(world, random);
         // smooth map.
         smoothMap(world);
-        // draws the world to the screen
-        // ter.renderFrame(world);
         return world;
     }
 
@@ -132,17 +130,17 @@ public class MapGenerator {
         } else {
             // pop out the current point position.
             posList.removeLast();
-            while (!posList.isEmpty()) {
+            while (!posList.isEmpty() && isDeadEnd(curPos, visited)) {
                 Position prevPos = posList.getLast();
                 world[curPos.x][curPos.y] = Tileset.FLOOR;
-                if (!isDeadEnd(curPos, visited)) {
-                    posList.addLast(curPos);
-                    break;
-                }
                 world[prevPos.x][prevPos.y] = Tileset.FLOOR;
                 world[(curPos.x + prevPos.x) / 2][(curPos.y + prevPos.y) / 2] = Tileset.FLOOR;
                 curPos = prevPos;
                 posList.removeLast();
+            }
+            // push item, restart searching at current position.
+            if (!isDeadEnd(curPos, visited)) {
+                posList.addLast(curPos);
             }
         }
         dfsHallway(posList, world, curPos, visited, random);
