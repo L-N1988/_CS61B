@@ -4,8 +4,8 @@ import edu.princeton.cs.algs4.WeightedQuickUnionUF;
 
 public class Percolation {
     private boolean[][] map;
-    private WeightedQuickUnionUF ufBlock;
-    private WeightedQuickUnionUF ufWater;
+    private WeightedQuickUnionUF uf;
+    private WeightedQuickUnionUF ufHelper;
     private final int size;
     private int numSite;
 
@@ -15,19 +15,22 @@ public class Percolation {
             throw new IllegalArgumentException();
         }
         map = new boolean[N][N];
-        ufBlock = new WeightedQuickUnionUF(N * N);
-        ufWater = new WeightedQuickUnionUF(N * N);
+        uf = new WeightedQuickUnionUF(N * N + 2);
+        ufHelper = new WeightedQuickUnionUF(N * N + 1);
         size = N;
         numSite = 0;
+        // union virtual sites
+        for (int i = 0; i < size; i++) {
+            uf.union(i, N * N);
+            uf.union((N - 1) * N + i, N * N + 1);
+            ufHelper.union(i, N * N);
+        }
     }
 
     // open the site (row, col) if it is not open already
     public void open(int row, int col) {
-        if (row < 0 || col < 0) {
+        if (row < 0 || col < 0 || row >= size || col >= size) {
             // throw new java.lang.IllegalArgumentException();
-            return;
-        } else if (row >= size || col >= size) {
-            // throw new java.lang.IndexOutOfBoundsException();
             return;
         }
         if (!isOpen(row, col)) {
@@ -35,74 +38,20 @@ public class Percolation {
             numSite += 1;
             // union around sites.
             if (isOpen(row - 1, col)) {
-                ufBlock.union(row * size + col, (row - 1) * size + col);
+                uf.union(row * size + col, (row - 1) * size + col);
+                ufHelper.union(row * size + col, (row - 1) * size + col);
             }
             if (isOpen(row + 1, col)) {
-                ufBlock.union(row * size + col, (row + 1) * size + col);
+                uf.union(row * size + col, (row + 1) * size + col);
+                ufHelper.union(row * size + col, (row + 1) * size + col);
             }
             if (isOpen(row, col - 1)) {
-                ufBlock.union(row * size + col, row * size + col - 1);
+                uf.union(row * size + col, row * size + col - 1);
+                ufHelper.union(row * size + col, row * size + col - 1);
             }
             if (isOpen(row, col + 1)) {
-                ufBlock.union(row * size + col, row * size + col + 1);
-            }
-            // the site is not water
-            // search around water
-            if (isFull(row - 1, col)) {
-                ufWater.union(row * size + col, (row - 1) * size + col);
-            }
-            if (isFull(row + 1, col)) {
-                ufWater.union(row * size + col, (row + 1) * size + col);
-            }
-            if (isFull(row, col - 1)) {
-                ufWater.union(row * size + col, row * size + col - 1);
-            }
-            if (isFull(row, col + 1)) {
-                ufWater.union(row * size + col, row * size + col + 1);
-            }
-            // the site is water
-            // percolate around sites
-            if (isFull(row, col)) {
-                if (isOpen(row - 1, col)) {
-                    ufWater.union(row * size + col, (row - 1) * size + col);
-                    for (int i = 0; i < size; i++) {
-                        for (int j = 0; j < size; j++) {
-                            if (ufBlock.connected(i * size + j, (row - 1) * size + col)) {
-                                ufWater.union(row * size + col, i * size + j);
-                            }
-                        }
-                    }
-                }
-                if (isOpen(row + 1, col)) {
-                    ufWater.union(row * size + col, (row + 1) * size + col);
-                    for (int i = 0; i < size; i++) {
-                        for (int j = 0; j < size; j++) {
-                            if (ufBlock.connected(i * size + j, (row + 1) * size + col)) {
-                                ufWater.union(row * size + col, i * size + j);
-                            }
-                        }
-                    }
-                }
-                if (isOpen(row, col - 1)) {
-                    ufWater.union(row * size + col, row * size + col - 1);
-                    for (int i = 0; i < size; i++) {
-                        for (int j = 0; j < size; j++) {
-                            if (ufBlock.connected(i * size + j, row * size + col - 1)) {
-                                ufWater.union(row * size + col, i * size + j);
-                            }
-                        }
-                    }
-                }
-                if (isOpen(row, col + 1)) {
-                    ufWater.union(row * size + col, row * size + col + 1);
-                    for (int i = 0; i < size; i++) {
-                        for (int j = 0; j < size; j++) {
-                            if (ufBlock.connected(i * size + j, row * size + col + 1)) {
-                                ufWater.union(row * size + col, i * size + j);
-                            }
-                        }
-                    }
-                }
+                uf.union(row * size + col, row * size + col + 1);
+                ufHelper.union(row * size + col, row * size + col + 1);
             }
         }
     }
@@ -126,19 +75,8 @@ public class Percolation {
             return false;
         }
         if (isOpen(row, col)) {
-            if (row == 0) {
-                return true;
-            } else {
-                // explore around corners
-                return ((row - 1) * size + col < size * size
-                        && ufWater.connected(row * size + col, (row - 1) * size + col))
-                        || ((row + 1) * size +col < size * size
-                        && ufWater.connected(row * size + col, (row + 1) * size + col))
-                        || (row * size + col - 1 < size * size
-                        && ufWater.connected(row * size + col, row * size + col - 1))
-                        || (row * size + col + 1 < size * size
-                        && ufWater.connected(row * size + col, row * size + col + 1));
-            }
+            return uf.connected(row * size + col, size * size)
+                    && ufHelper.connected(row * size + col, size * size);
         } else {
             return false;
         }
@@ -151,18 +89,13 @@ public class Percolation {
 
     // does the system percolated?
     public boolean percolates() {
-        for (int i = 0; i < size; i++) {
-            if (isFull(size - 1, i)) {
-                return true;
-            }
-        }
-        return  false;
+        return uf.connected(size * size, size * size + 1);
     }
 
     // use for unit testing (not required)
     public static void main(String[] args) {
         int N = 35;
-        int T = 30;
+        int T = 900;
         PercolationStats stat = new PercolationStats(N, T, new PercolationFactory());
         System.out.println("mean = " + stat.mean());
         System.out.println("stddev = " + stat.stddev());

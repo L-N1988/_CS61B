@@ -2,6 +2,7 @@ package hw2;
 
 import edu.princeton.cs.introcs.StdStats;
 import edu.princeton.cs.introcs.StdRandom;
+import edu.princeton.cs.introcs.Stopwatch;
 
 public class PercolationStats {
     private double[] data;
@@ -11,11 +12,16 @@ public class PercolationStats {
 
     // perform T independent experiments on an N-by-N grid
     public PercolationStats(int N, int T, PercolationFactory pf) {
+        if (N <= 0 || T <= 0) {
+            throw new IllegalArgumentException();
+        }
         data = new double[T];
         this.N = N;
         this.T = T;
         ppf = pf;
+        Stopwatch timer = new Stopwatch();
         expSimulation();
+        System.out.println(timer.elapsedTime());
     }
 
     public void expSimulation() {
