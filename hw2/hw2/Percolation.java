@@ -89,6 +89,10 @@ public class Percolation {
 
     // does the system percolated?
     public boolean percolates() {
+        // treat boundary condition
+        if (size == 1) {
+            return isFull(0, 0);
+        }
         return uf.connected(size * size, size * size + 1);
     }
 

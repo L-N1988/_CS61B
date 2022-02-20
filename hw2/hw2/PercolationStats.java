@@ -24,7 +24,7 @@ public class PercolationStats {
         System.out.println(timer.elapsedTime());
     }
 
-    public void expSimulation() {
+    private void expSimulation() {
         for (int i = 0; i < T; i++) {
             data[i] = expSim();
         }
@@ -37,7 +37,7 @@ public class PercolationStats {
             int col = StdRandom.uniform(N);
             perc.open(row, col);
         }
-        return (double) perc.numberOfOpenSites()/ (N * N);
+        return (double) perc.numberOfOpenSites() / (N * N);
     }
 
     // sample mean of percolation threshold
