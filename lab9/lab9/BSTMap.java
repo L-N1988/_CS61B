@@ -4,6 +4,8 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
+import static org.junit.Assert.*;
+
 /**
  * Implementation of interface Map61B with BST as core data structure.
  *
@@ -129,49 +131,49 @@ public class BSTMap<K extends Comparable<K>, V> implements Map61B<K, V> {
      */
     @Override
     public V remove(K key) {
-        return removeHelper(key, root);
+        V retV = get(key);
+        root = removeHelper(key, root);
+        return retV;
     }
 
-    private V removeHelper(K key, Node p) {
+    private Node removeHelper(K key, Node p) {
         if (p == null) {
             return null;
         }
         int cmp = key.compareTo(p.key);
         if (cmp > 0) {
-            return removeHelper(key, p.right);
+            p.right =  removeHelper(key, p.right);
         } else if (cmp < 0) {
-            return removeHelper(key, p.left);
+            p.left =  removeHelper(key, p.left);
         } else {
-            V retV = p.value;
-            if (p.left == null && p.right == null) {
-                p = null;
-            } else if (p.left != null && p.right != null) {
-                Node successor = findSmallest(p.right);
-                p.value = successor.value;
-                p.key = successor.key;
-                // all items in subtree map are distinct
-                // remove the successor
-                removeHelper(successor.key, p.right);
-            } else {
-                if (p.left != null) {
-                    p = p.left;
-                } else {
-                    p = p.right;
-                }
+            size -= 1;
+            if (p.left == null) {
+                return p.right;
             }
-            return retV;
+            if (p.right == null) {
+                return p.left;
+            }
+            Node t = p;
+            p = findMin(t.right);
+            p.right = deleteMin(t.right);
+            p.left = t.left;
         }
+        return p;
     }
 
-    private Node findSmallest(Node p) {
-        if (p == null) {
-            return null;
-        }
-        if (p.left != null) {
-            return findSmallest(p.left);
-        } else {
+    private Node findMin(Node p) {
+        if (p.left == null) {
             return p;
         }
+        return findMin(p.left);
+    }
+
+    private Node deleteMin(Node p) {
+        if (p.left == null) {
+            return p.right;
+        }
+        p.left = deleteMin(p.left);
+        return p;
     }
 
     /** Removes the key-value entry for the specified key only if it is
@@ -189,5 +191,20 @@ public class BSTMap<K extends Comparable<K>, V> implements Map61B<K, V> {
     @Override
     public Iterator<K> iterator() {
         return keySet().iterator();
+    }
+
+    private void printBSTMap() {
+        for (K item : this) {
+            System.out.println(item + " " + get(item));
+        }
+        System.out.println();
+        System.out.println("size: " + size());
+    }
+
+    public static void main(String[] args) {
+        BSTMap<String, Integer> b = new BSTMap<String, Integer>();
+        b.put("hi", 1);
+        assertTrue(b.containsKey("hi"));
+        assertTrue(b.get("hi") != null);
     }
 }
