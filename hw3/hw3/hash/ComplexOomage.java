@@ -21,6 +21,9 @@ public class ComplexOomage implements Oomage {
 
     @Override
     public boolean equals(Object o) {
+        if (o == null) {
+            return false;
+        }
         if (o.getClass() != this.getClass()) {
             return false;
         }
@@ -86,5 +89,13 @@ public class ComplexOomage implements Oomage {
         randomComplexOomage().draw(0.75, 0.75, 1.5);
         randomComplexOomage().draw(0.25, 0.75, 1.5);
         randomComplexOomage().draw(0.75, 0.25, 1.5);
+
+        List<Oomage> oomages = new ArrayList<>();
+        int N = 600;
+        for (int i = 0; i < N; i += 1) {
+            oomages.add(ComplexOomage.randomComplexOomage());
+        }
+        StdDraw.clear();
+        HashTableVisualizer.visualize(oomages, 100, 0.5);
     }
 } 
