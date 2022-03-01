@@ -1,10 +1,10 @@
 package hw4.puzzle;
 import edu.princeton.cs.algs4.Queue;
 
-public class Board implements WorldState{
+public class Board implements WorldState {
     private int N;
     int[][] tiles;
-    private final static int BLANK = 0;
+    private static final int BLANK = 0;
 
     public Board(int[][] tiles) {
         N = tiles.length;
@@ -131,7 +131,7 @@ public class Board implements WorldState{
         s.append(N + "\n");
         for (int i = 0; i < N; i++) {
             for (int j = 0; j < N; j++) {
-                s.append(String.format("%2d ", tileAt(i,j)));
+                s.append(String.format("%2d ", tileAt(i, j)));
             }
             s.append("\n");
         }

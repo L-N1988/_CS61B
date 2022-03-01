@@ -10,29 +10,29 @@ import java.util.Set;
 
 
 public class Solver {
-    private class searchNode implements Comparable {
+    private class SearchNode implements Comparable {
         WorldState cur;
         int dist;
-        searchNode prev;
+        SearchNode prev;
 
-        public searchNode(WorldState c, int dist, searchNode prev) {
-           cur = c;
-           this.dist = dist;
-           this.prev = prev;
+        SearchNode(WorldState c, int dist, SearchNode prev) {
+            cur = c;
+            this.dist = dist;
+            this.prev = prev;
         }
 
         // enable priority queue works in A* algorithm
         @Override
         public int compareTo(Object o) {
             return Integer.compare(dist + cur.estimatedDistanceToGoal(),
-                    ((searchNode) o).dist + ((searchNode) o).cur.estimatedDistanceToGoal());
+                    ((SearchNode) o).dist + ((SearchNode) o).cur.estimatedDistanceToGoal());
         }
     }
-    private MinPQ<searchNode> pq;
-    private Set<searchNode> pqHelper;
-    private searchNode start;
+    private MinPQ<SearchNode> pq;
+    private Set<SearchNode> pqHelper;
+    private SearchNode start;
     private Map<String, Integer> nodeDist;              // store every node's distance
-    public static int enqueueCountMonitor;
+    static int enqueueCountMonitor;
 
     /*
     * Constructor which solves the puzzle, computing
@@ -42,7 +42,7 @@ public class Solver {
      */
     public Solver(WorldState initial) {
         enqueueCountMonitor = 0;
-        start = new searchNode(initial, 0, null);
+        start = new SearchNode(initial, 0, null);
         nodeDist = new HashMap<>();
         // map start distance to 0
         nodeDist.put(start.cur.toString(), 0);
@@ -59,13 +59,13 @@ public class Solver {
             }
             // search around edges
             for (WorldState item : start.cur.neighbors()) {
-                searchNode node = new searchNode(item, start.dist + 1, start);
+                SearchNode node = new SearchNode(item, start.dist + 1, start);
                 relax(node);
             }
         }
     }
 
-    private void relax(searchNode node) {
+    private void relax(SearchNode node) {
         if (!nodeDist.containsKey(node.cur.toString())
                 || nodeDist.get(node.cur.toString()) > distance(node)) {
             // update distance of the node
@@ -83,12 +83,12 @@ public class Solver {
         }
     }
 
-    private MinPQ<searchNode> decreaseKey(searchNode node) {
-        MinPQ<searchNode> tmp = new MinPQ<>();
+    private MinPQ<SearchNode> decreaseKey(SearchNode node) {
+        MinPQ<SearchNode> tmp = new MinPQ<>();
         tmp.insert(node);
         enqueueCountMonitor += 1;
         while (!pq.isEmpty()) {
-            searchNode item = pq.delMin();
+            SearchNode item = pq.delMin();
             if (!item.cur.equals(node.cur)) {
                 tmp.insert(item);
                 enqueueCountMonitor += 1;
@@ -97,7 +97,7 @@ public class Solver {
         return tmp;
     }
 
-    private int distance(searchNode node) {
+    private int distance(SearchNode node) {
         return node.dist + node.cur.estimatedDistanceToGoal();
     }
 
@@ -107,7 +107,7 @@ public class Solver {
      */
     public int moves() {
         int minMoves = 0;
-        searchNode tail = start;
+        SearchNode tail = start;
         while (tail.prev != null) {
             minMoves += 1;
             tail = tail.prev;
@@ -121,7 +121,7 @@ public class Solver {
      */
     public Iterable<WorldState> solution() {
         Stack<WorldState> ret = new Stack<>();
-        searchNode tail = start;
+        SearchNode tail = start;
         while (tail != null) {
             ret.push(tail.cur);
             tail = tail.prev;

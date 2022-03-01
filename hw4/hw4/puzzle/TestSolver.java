@@ -83,7 +83,7 @@ public class TestSolver {
         }
     }
 
-     public static Board readBoard(String filename) {
+    public static Board readBoard(String filename) {
         In in = new In(filename);
         int N = in.readInt();
         int[][] tiles = new int[N][N];
