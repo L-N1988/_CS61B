@@ -76,8 +76,8 @@ public class Board implements WorldState {
         int sumHam = 0;
         for (int i = 0; i < N; i++) {
             for (int j = 0; j < N; j++) {
-                if (tileAt(i, j) != 0
-                        || goleTileAt(i, j) != tileAt(i, j)) {
+                if (tileAt(i, j) != 0 
+                        && goleTileAt(i, j) != tileAt(i, j)) {
                     sumHam += 1;
                 }
             }
