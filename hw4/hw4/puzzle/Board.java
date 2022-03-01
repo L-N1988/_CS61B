@@ -1,9 +1,11 @@
 package hw4.puzzle;
 import edu.princeton.cs.algs4.Queue;
 
+import java.util.Arrays;
+
 public class Board implements WorldState {
     private int N;
-    int[][] tiles;
+    private int[][] tiles;
     private static final int BLANK = 0;
 
     public Board(int[][] tiles) {
@@ -21,10 +23,10 @@ public class Board implements WorldState {
     }
 
     private int goleTileAt(int i, int j) {
-        if (j == N - 1 && i == 0) {
+        if (j == N - 1 && i == N - 1) {
             return 0;
         }
-        return j + 1 + N * (N - 1 - i);
+        return i * N + j + 1;
     }
 
     public int size() {
@@ -74,7 +76,8 @@ public class Board implements WorldState {
         int sumHam = 0;
         for (int i = 0; i < N; i++) {
             for (int j = 0; j < N; j++) {
-                if (goleTileAt(i, j) != tileAt(i, j)) {
+                if (tileAt(i, j) != 0
+                        || goleTileAt(i, j) != tileAt(i, j)) {
                     sumHam += 1;
                 }
             }
@@ -96,8 +99,7 @@ public class Board implements WorldState {
         int x = (curPos - 1) / N;
         int y = (curPos - 1) % N;
         if (curPos == 0) {
-            x = N - 1;
-            y = N - 1;
+            return 0;
         }
         return Math.abs(x - i) + Math.abs(y - j);
     }
@@ -113,6 +115,9 @@ public class Board implements WorldState {
         if (y == null || this.getClass() != y.getClass()) {
             return false;
         }
+        if (((Board) y).tiles.length != N || ((Board) y).tiles[0].length != N) {
+            return false;
+        }
         for (int i = 0; i < N; i++) {
             for (int j = 0; j < N; j++) {
                 if (tileAt(i, j) != ((Board) y).tileAt(i, j)) {
@@ -123,14 +128,19 @@ public class Board implements WorldState {
         return true;
     }
 
+    @Override
+    public int hashCode() {
+        return Arrays.deepHashCode(tiles);
+    }
+
     /** Returns the string representation of the board. 
       * Uncomment this method. */
     public String toString() {
         StringBuilder s = new StringBuilder();
-        int N = size();
-        s.append(N + "\n");
-        for (int i = 0; i < N; i++) {
-            for (int j = 0; j < N; j++) {
+        int size = size();
+        s.append(size + "\n");
+        for (int i = 0; i < size; i++) {
+            for (int j = 0; j < size; j++) {
                 s.append(String.format("%2d ", tileAt(i, j)));
             }
             s.append("\n");

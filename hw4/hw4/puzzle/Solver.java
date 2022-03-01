@@ -32,7 +32,6 @@ public class Solver {
     private Set<SearchNode> pqHelper;
     private SearchNode start;
     private Map<String, Integer> nodeDist;              // store every node's distance
-    static int enqueueCountMonitor;
 
     /*
     * Constructor which solves the puzzle, computing
@@ -41,7 +40,6 @@ public class Solver {
     * puzzle using the A* algorithm. Assumes a solution exists.
      */
     public Solver(WorldState initial) {
-        enqueueCountMonitor = 0;
         start = new SearchNode(initial, 0, null);
         nodeDist = new HashMap<>();
         // map start distance to 0
@@ -50,7 +48,6 @@ public class Solver {
         pqHelper = new HashSet<>();
         pq.insert(start);
         pqHelper.add(start);
-        enqueueCountMonitor += 1;
         while (!pq.isEmpty()) {
             start = pq.delMin();
             pqHelper.remove(start);
@@ -78,7 +75,6 @@ public class Solver {
                 }
                 pq.insert(node);
                 pqHelper.add(node);
-                enqueueCountMonitor += 1;
             }
         }
     }
@@ -86,12 +82,10 @@ public class Solver {
     private MinPQ<SearchNode> decreaseKey(SearchNode node) {
         MinPQ<SearchNode> tmp = new MinPQ<>();
         tmp.insert(node);
-        enqueueCountMonitor += 1;
         while (!pq.isEmpty()) {
             SearchNode item = pq.delMin();
             if (!item.cur.equals(node.cur)) {
                 tmp.insert(item);
-                enqueueCountMonitor += 1;
             }
         }
         return tmp;
