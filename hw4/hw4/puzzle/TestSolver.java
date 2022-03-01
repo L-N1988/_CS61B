@@ -122,10 +122,13 @@ public class TestSolver {
         }
     }
 
-    @Test(timeout = 20000)
+    @Test(timeout = 200000)
     public void test4x4BoardPuzzles() {
-        for (int i = 0; i <= 30; i += 1) {
+        for (int i = 29; i < 40; i += 1) {
             String pnum = String.format("%02d", i);
+            if (pnum.equals("24")) {
+                continue;
+            }
             String puzzleName = "input/puzzle4x4-" + pnum + ".txt";
             Board b = readBoard(puzzleName);
             int numMoves = i;

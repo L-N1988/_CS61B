@@ -2,13 +2,18 @@ package hw4.puzzle;
 import edu.princeton.cs.algs4.Queue;
 
 public class Board implements WorldState{
-    int N;
+    private int N;
     int[][] tiles;
     private final static int BLANK = 0;
 
     public Board(int[][] tiles) {
-        this.tiles = tiles;
         N = tiles.length;
+        this.tiles = new int[N][N];
+        for (int i = 0; i < N; i++) {
+            for (int j = 0; j < N; j++) {
+                this.tiles[i][j] = tiles[i][j];
+            }
+        }
     }
 
     public int tileAt(int i, int j) {
@@ -16,10 +21,10 @@ public class Board implements WorldState{
     }
 
     private int goleTileAt(int i, int j) {
-        if (i == N - 1 && j == N -1) {
+        if (j == N - 1 && i == 0) {
             return 0;
         }
-        return i * N + j + 1;
+        return j + 1 + N * (N - 1 - i);
     }
 
     public int size() {
@@ -87,16 +92,14 @@ public class Board implements WorldState{
     }
 
     private int calcManhattan(int i, int j) {
-        if (goleTileAt(i, j) == tileAt(i, j)) {
-            return 0;
-        }
         int curPos = tileAt(i, j);
+        int x = (curPos - 1) / N;
+        int y = (curPos - 1) % N;
         if (curPos == 0) {
-            return N - 1 - i + N - 1 -j;
+            x = N - 1;
+            y = N - 1;
         }
-        int hor = curPos % N - 1;
-        int ver = curPos / N;
-        return Math.abs(hor - i) + Math.abs(ver - j);
+        return Math.abs(x - i) + Math.abs(y - j);
     }
 
     public int estimatedDistanceToGoal() {
@@ -104,11 +107,18 @@ public class Board implements WorldState{
     }
 
     public boolean equals(Object y) {
-        if (y == null) {
+        if (this == y) {
+            return true;
+        }
+        if (y == null || this.getClass() != y.getClass()) {
             return false;
         }
-        if (this.getClass() != y.getClass()) {
-            return false;
+        for (int i = 0; i < N; i++) {
+            for (int j = 0; j < N; j++) {
+                if (tileAt(i, j) != ((Board) y).tileAt(i, j)) {
+                    return false;
+                }
+            }
         }
         return true;
     }

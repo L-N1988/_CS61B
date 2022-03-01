@@ -1,11 +1,13 @@
 package hw4.puzzle;
 
 import edu.princeton.cs.algs4.MinPQ;
+import edu.princeton.cs.algs4.Stack;
 
+import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.Queue;
+import java.util.Map;
 import java.util.Set;
+
 
 public class Solver {
     private class searchNode implements Comparable {
@@ -19,15 +21,18 @@ public class Solver {
            this.prev = prev;
         }
 
+        // enable priority queue works in A* algorithm
         @Override
         public int compareTo(Object o) {
-            return Integer.compare(dist, ((searchNode) o).dist);
+            return Integer.compare(dist + cur.estimatedDistanceToGoal(),
+                    ((searchNode) o).dist + ((searchNode) o).cur.estimatedDistanceToGoal());
         }
     }
+    private MinPQ<searchNode> pq;
+    private Set<searchNode> pqHelper;
     private searchNode start;
-    private searchNode prev;
-    private MinPQ<searchNode> sol;
-    private Set<WorldState> pathSet;
+    private Map<String, Integer> nodeDist;              // store every node's distance
+    public static int enqueueCountMonitor;
 
     /*
     * Constructor which solves the puzzle, computing
@@ -36,38 +41,64 @@ public class Solver {
     * puzzle using the A* algorithm. Assumes a solution exists.
      */
     public Solver(WorldState initial) {
+        enqueueCountMonitor = 0;
         start = new searchNode(initial, 0, null);
-        sol = new MinPQ<>();
-        pathSet = new HashSet<>();
-        sol.insert(start);
-        int curDist = 0;
-        while (!sol.isEmpty()) {
-            start = sol.delMin();
-            pathSet.add(start.cur);
+        nodeDist = new HashMap<>();
+        // map start distance to 0
+        nodeDist.put(start.cur.toString(), 0);
+        pq = new MinPQ<>();
+        pqHelper = new HashSet<>();
+        pq.insert(start);
+        pqHelper.add(start);
+        enqueueCountMonitor += 1;
+        while (!pq.isEmpty()) {
+            start = pq.delMin();
+            pqHelper.remove(start);
             if (start.cur.isGoal()) {
-                System.out.println();
                 return;
             }
-            MinPQ<searchNode> tmpPQ = new MinPQ<>();
+            // search around edges
             for (WorldState item : start.cur.neighbors()) {
-                searchNode node = new searchNode(item, curDist + item.estimatedDistanceToGoal(), start);
-                if (!pathSet.contains(item)) {
-                    tmpPQ.insert(node);
-                }
+                searchNode node = new searchNode(item, start.dist + 1, start);
+                relax(node);
             }
-            searchNode next = tmpPQ.delMin();
-            if (start.prev != null) {
-                for (WorldState prevItem : start.prev.cur.neighbors()) {
-                    if (prevItem.equals(next.cur)) {
-                        pathSet.remove(start.cur);
-                        curDist -= 1;
-                    }
-                }
-            }
-            sol.insert(next);
-            System.out.println(next.cur + " " + next.cur.estimatedDistanceToGoal());
-            curDist += 1;
         }
+    }
+
+    private void relax(searchNode node) {
+        if (!nodeDist.containsKey(node.cur.toString())
+                || nodeDist.get(node.cur.toString()) > distance(node)) {
+            // update distance of the node
+            nodeDist.put(node.cur.toString(), distance(node));
+            if (pqHelper.contains(node)) {
+                pq = decreaseKey(node);
+            } else {
+                if (node.cur.equals(node.prev.cur)) {
+                    return;
+                }
+                pq.insert(node);
+                pqHelper.add(node);
+                enqueueCountMonitor += 1;
+            }
+        }
+    }
+
+    private MinPQ<searchNode> decreaseKey(searchNode node) {
+        MinPQ<searchNode> tmp = new MinPQ<>();
+        tmp.insert(node);
+        enqueueCountMonitor += 1;
+        while (!pq.isEmpty()) {
+            searchNode item = pq.delMin();
+            if (!item.cur.equals(node.cur)) {
+                tmp.insert(item);
+                enqueueCountMonitor += 1;
+            }
+        }
+        return tmp;
+    }
+
+    private int distance(searchNode node) {
+        return node.dist + node.cur.estimatedDistanceToGoal();
     }
 
     /*
@@ -75,7 +106,13 @@ public class Solver {
     * at the initial WorldState.
      */
     public int moves() {
-        return pathSet.size() - 1;
+        int minMoves = 0;
+        searchNode tail = start;
+        while (tail.prev != null) {
+            minMoves += 1;
+            tail = tail.prev;
+        }
+        return minMoves;
     }
 
     /*
@@ -83,6 +120,12 @@ public class Solver {
     * to the solution.
      */
     public Iterable<WorldState> solution() {
-        return pathSet;
+        Stack<WorldState> ret = new Stack<>();
+        searchNode tail = start;
+        while (tail != null) {
+            ret.push(tail.cur);
+            tail = tail.prev;
+        }
+        return ret;
     }
 }
