@@ -76,6 +76,9 @@ public class MergeSort {
             Queue<Item> items) {
         // print unsorted queue.
         Queue<Queue<Item>> singleItems = makeSingleItemQueues(items);
+        if (singleItems.isEmpty()) {
+            return null;
+        }
         while (singleItems.size() != 1) {
             singleItems.enqueue(mergeSortedQueues(singleItems.dequeue(), singleItems.dequeue()));
         }
@@ -85,6 +88,7 @@ public class MergeSort {
 
     public static void main(String[] args) {
         Queue<Integer> numbers = new Queue<>();
+        System.out.println(mergeSort(numbers));
         numbers.enqueue(9);
         numbers.enqueue(8);
         numbers.enqueue(7);
