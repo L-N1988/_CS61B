@@ -11,7 +11,7 @@ public class MergeSort {
      * @param   q2  A Queue in sorted order from least to greatest.
      * @return      The smallest item that is in q1 or q2.
      */
-    private static <Item extends Comparable> Item getMin(
+    private static <Item extends Comparable<Item>> Item getMin(
             Queue<Item> q1, Queue<Item> q2) {
         if (q1.isEmpty()) {
             return q2.dequeue();
@@ -32,10 +32,15 @@ public class MergeSort {
     }
 
     /** Returns a queue of queues that each contain one item from items. */
-    private static <Item extends Comparable> Queue<Queue<Item>>
+    private static <Item extends Comparable<Item>> Queue<Queue<Item>>
             makeSingleItemQueues(Queue<Item> items) {
-        // Your code here!
-        return null;
+        Queue<Queue<Item>> singleResult = new Queue<>();
+        while (!items.isEmpty()) {
+            Queue<Item> item = new Queue<>();
+            item.enqueue(items.dequeue());
+            singleResult.enqueue(item);
+        }
+        return singleResult;
     }
 
     /**
@@ -51,16 +56,53 @@ public class MergeSort {
      *              greatest.
      *
      */
-    private static <Item extends Comparable> Queue<Item> mergeSortedQueues(
+    private static <Item extends Comparable<Item>> Queue<Item> mergeSortedQueues(
             Queue<Item> q1, Queue<Item> q2) {
-        // Your code here!
-        return null;
+        if (q1 == null) {
+            return q2;
+        }
+        if (q2 == null) {
+            return q1;
+        }
+        Queue<Item> mergeResult = new Queue<>();
+        while (!q1.isEmpty() || !q2.isEmpty()) {
+            mergeResult.enqueue(getMin(q1, q2));
+        }
+        return mergeResult;
     }
 
     /** Returns a Queue that contains the given items sorted from least to greatest. */
-    public static <Item extends Comparable> Queue<Item> mergeSort(
+    public static <Item extends Comparable<Item>> Queue<Item> mergeSort(
             Queue<Item> items) {
-        // Your code here!
-        return items;
+        // print unsorted queue.
+        Queue<Queue<Item>> singleItems = makeSingleItemQueues(items);
+        while (singleItems.size() != 1) {
+            singleItems.enqueue(mergeSortedQueues(singleItems.dequeue(), singleItems.dequeue()));
+        }
+        // print sorted queue.
+        return singleItems.dequeue();
+    }
+
+    public static void main(String[] args) {
+        Queue<Integer> numbers = new Queue<>();
+        numbers.enqueue(9);
+        numbers.enqueue(8);
+        numbers.enqueue(7);
+        numbers.enqueue(6);
+        numbers.enqueue(5);
+        numbers.enqueue(4);
+        numbers.enqueue(3);
+        numbers.enqueue(2);
+        numbers.enqueue(1);
+        numbers.enqueue(0);
+        System.out.println("raw data: " + numbers);
+        System.out.println("sorted data: " + mergeSort(numbers));
+
+        Queue<String> students = new Queue<>();
+        students.enqueue("Alice");
+        students.enqueue("Vanessa");
+        students.enqueue("Ethan");
+        System.out.println("raw data: " + students);
+        System.out.println("sorted data: " + mergeSort(students));
     }
 }
