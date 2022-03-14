@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
@@ -30,13 +31,11 @@ public class GraphDB {
         String id;
         String lat;
         String lon;
-        Map<String, String> highway;
 
         Node(String id, String lat, String lon) {
             this.id = id;
             this.lat = lat;
             this.lon = lon;
-            this.highway = new HashMap<>();
         }
 
         @Override
@@ -47,7 +46,8 @@ public class GraphDB {
             if (o == null || this.getClass() != o.getClass()) {
                 return false;
             }
-            return this.id.equals(((Node) o).id);
+            Node other = (Node) o;
+            return this.id.equals(other.id) && this.lat.equals(other.lat) && this.lon.equals(other.lon);
         }
     }
 
@@ -107,10 +107,15 @@ public class GraphDB {
      *  we can reasonably assume this since typically roads are connected.
      */
     private void clean() {
+        LinkedList<String> toBeRemoved = new LinkedList<>();
         for (Map.Entry<String, Node> item : nodes.entrySet()) {
             if (graph.get(item.getKey()).isEmpty()) {
-                nodes.remove(item);
+                toBeRemoved.add(item.getKey());
             }
+        }
+        System.out.println(toBeRemoved.size() + " nodes to be removed.");
+        for (String id : toBeRemoved) {
+            nodes.remove(id);
         }
     }
 
@@ -119,7 +124,6 @@ public class GraphDB {
      * @return An iterable of id's of all vertices in the graph.
      */
     Iterable<Long> vertices() {
-        clean();
         return nodes.keySet().stream().map(s -> Long.parseLong(s)).collect(Collectors.toSet());
     }
 
@@ -195,7 +199,6 @@ public class GraphDB {
      * @return The id of the node in the graph closest to the target.
      */
     long closest(double lon, double lat) {
-        clean();
         long closestID = 0;
         double dist = Double.MAX_VALUE;
         for (Long id : vertices()) {
