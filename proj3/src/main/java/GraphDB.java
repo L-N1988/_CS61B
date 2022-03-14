@@ -113,7 +113,6 @@ public class GraphDB {
                 toBeRemoved.add(item.getKey());
             }
         }
-        System.out.println(toBeRemoved.size() + " nodes to be removed.");
         for (String id : toBeRemoved) {
             nodes.remove(id);
         }

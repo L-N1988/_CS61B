@@ -41,13 +41,10 @@ public class GraphBuildingHandler extends DefaultHandler {
                     "secondary_link", "tertiary_link"));
     private String activeState = "";
     private final GraphDB g;
-    private GraphDB.Node nd;
     private LinkedList<GraphDB.Node> way;
     private boolean validWay;
     private final Map<String, String> location = new HashMap<>();
     private String id;
-    private String lat;
-    private String lon;
 
     /**
      * Create a new GraphBuildingHandler.
@@ -84,6 +81,8 @@ public class GraphBuildingHandler extends DefaultHandler {
 
             /* TODO Use the above information to save a "node" to somewhere. */
             /* Hint: A graph-like structure would be nice. */
+            String lat;
+            String lon;
             id = attributes.getValue("id");
             lat = attributes.getValue("lat");
             lon = attributes.getValue("lon");
@@ -94,7 +93,7 @@ public class GraphBuildingHandler extends DefaultHandler {
             activeState = "way";
             // System.out.println("Beginning a way...");
             way = new LinkedList<>();
-            validWay = true;
+            validWay = false;
         } else if (activeState.equals("way") && qName.equals("nd")) {
             /* While looking at a way, we found a <nd...> tag. */
             // System.out.println("Id of a node in this way: " + attributes.getValue("ref"));
@@ -106,7 +105,7 @@ public class GraphBuildingHandler extends DefaultHandler {
             makes this way invalid. Instead, think of keeping a list of possible connections and
             remember whether this way is valid or not. */
             String id = attributes.getValue("ref");
-            nd = g.getNode(id);
+            GraphDB.Node nd = g.getNode(id);
             // store all possible connection of nodes in one way
             way.addLast(nd);
         } else if (activeState.equals("way") && qName.equals("tag")) {
@@ -118,8 +117,8 @@ public class GraphBuildingHandler extends DefaultHandler {
                 /* TODO set the max speed of the "current way" here. */
             } else if (k.equals("highway")) {
                 // System.out.println("Highway type: " + v);
-                if (!ALLOWED_HIGHWAY_TYPES.contains(v)) {
-                    validWay = false;
+                if (ALLOWED_HIGHWAY_TYPES.contains(v)) {
+                    validWay = true;
                 }
             } else if (k.equals("name")) {
                 // System.out.println("Way Name: " + v);
@@ -177,7 +176,7 @@ public class GraphBuildingHandler extends DefaultHandler {
                     index++;
                 }
             }
-            validWay = true;
+            validWay = false;
             // System.out.println("Finishing a way...");
         }
     }
