@@ -86,7 +86,7 @@ public class GraphBuildingHandler extends DefaultHandler {
             id = attributes.getValue("id");
             lat = attributes.getValue("lat");
             lon = attributes.getValue("lon");
-            g.addNode(new GraphDB.Node(id, lat, lon));
+            g.addNode(new GraphDB.Node(id, lat, lon, Double.MAX_VALUE));
             g.addWay(id, new LinkedList<>());
         } else if (qName.equals("way")) {
             /* We encountered a new <way...> tag. */
@@ -104,8 +104,8 @@ public class GraphBuildingHandler extends DefaultHandler {
             cumbersome since you might have to remove the connections if you later see a tag that
             makes this way invalid. Instead, think of keeping a list of possible connections and
             remember whether this way is valid or not. */
-            String id = attributes.getValue("ref");
-            GraphDB.Node nd = g.getNode(id);
+            String ids = attributes.getValue("ref");
+            GraphDB.Node nd = g.getNode(ids);
             // store all possible connection of nodes in one way
             way.addLast(nd);
         } else if (activeState.equals("way") && qName.equals("tag")) {
@@ -117,6 +117,8 @@ public class GraphBuildingHandler extends DefaultHandler {
                 /* TODO set the max speed of the "current way" here. */
             } else if (k.equals("highway")) {
                 // System.out.println("Highway type: " + v);
+                // valid only if it is a “highway” AND
+                // it is one of the ALLOWED_HIGHWAY_TYPES
                 if (ALLOWED_HIGHWAY_TYPES.contains(v)) {
                     validWay = true;
                 }

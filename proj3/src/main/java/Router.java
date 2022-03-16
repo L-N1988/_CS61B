@@ -1,5 +1,8 @@
+
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
+import java.util.PriorityQueue;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -25,7 +28,53 @@ public class Router {
      */
     public static List<Long> shortestPath(GraphDB g, double stlon, double stlat,
                                           double destlon, double destlat) {
-        return null; // FIXME
+        LinkedList<Long> pathNodes = new LinkedList<>();
+        GraphDB.Node start = g.getNode(Long.toString(g.closest(stlon, stlat)));
+        GraphDB.Node dest = g.getNode(Long.toString(g.closest(destlon, destlat)));
+        PriorityQueue<GraphDB.Node> pq = new PriorityQueue<>();
+        GraphDB.Node cur = null;
+        resetAllNodes(g, dest);
+        pq.add(start);
+        // set start distance to zero
+        g.addEdge(null, g.getNodeID(start), 0);
+        while (!pq.isEmpty()) {
+            cur = pq.poll();
+            String curID = g.getNodeID(cur);
+            if (cur.equals(dest)) {
+                break;
+            }
+            for (Long id : g.adjacent(Long.parseLong(g.getNodeID(cur)))) {
+                relax(g, Long.toString(id), curID, pq);
+            }
+        }
+        while (cur != null) {
+            pathNodes.addFirst(Long.parseLong(g.getNodeID(cur)));
+            cur = cur.prev;
+        }
+        return pathNodes;
+    }
+
+    /**
+     * reset all nodes distance to infinity, set all previous node to null
+     * and calculate all heuristic distance to destination
+     */
+    private static void resetAllNodes(GraphDB g, GraphDB.Node dest) {
+        for (Long id : g.vertices()) {
+            g.addEdge(null, Long.toString(id), Double.MAX_VALUE);
+            g.getNode(Long.toString(id)).heuristic = g.distance(id, Long.parseLong(g.getNodeID(dest)));
+        }
+    }
+
+    private static void relax(GraphDB g, String nextID, String curID, PriorityQueue<GraphDB.Node> pq) {
+        double newDist = g.getDist(curID) + g.distance(Long.parseLong(nextID), Long.parseLong(curID));
+        if (g.getDist(nextID) > newDist) {
+            // if priority queue does not contain next node, do nothing
+            pq.remove(g.getNode(nextID));
+            // decrease distance (infinity or finite) to next node
+            g.addEdge(curID, nextID, newDist);
+            // insert node with new distance
+            pq.add(g.getNode(nextID));
+        }
     }
 
     /**

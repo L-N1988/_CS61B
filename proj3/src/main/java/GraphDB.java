@@ -6,7 +6,6 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
-import java.util.Objects;
 import java.util.stream.Collectors;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
@@ -27,15 +26,20 @@ public class GraphDB {
     private Map<String, LinkedList<Node>> graph = new HashMap<>();
     private final Map<String, Node> nodes = new HashMap<>();
 
-    static class Node {
+    static class Node implements Comparable {
         String id;
         String lat;
         String lon;
+        Node prev;
+        double distTo;
+        double heuristic;
 
-        Node(String id, String lat, String lon) {
+        Node(String id, String lat, String lon, double distTo) {
             this.id = id;
             this.lat = lat;
             this.lon = lon;
+            prev = null;
+            this.distTo = distTo;
         }
 
         @Override
@@ -47,7 +51,19 @@ public class GraphDB {
                 return false;
             }
             Node other = (Node) o;
-            return this.id.equals(other.id) && this.lat.equals(other.lat) && this.lon.equals(other.lon);
+            return this.id.equals(other.id)
+                    && this.lat.equals(other.lat) && this.lon.equals(other.lon);
+        }
+
+        @Override
+        public int hashCode() {
+            return this.id.hashCode();
+        }
+
+        @Override
+        public int compareTo(Object o) {
+            Node other = (Node) o;
+            return Double.compare(this.distTo + this.heuristic, other.distTo + other.heuristic);
         }
     }
 
@@ -86,6 +102,16 @@ public class GraphDB {
 
     public void addWay(String id, LinkedList<Node> way) {
         graph.put(id, way);
+    }
+
+    public void addEdge(String curId, String nextID, double distTo) {
+        Node next = getNode(nextID);
+        next.prev = getNode(curId);
+        next.distTo = distTo;
+    }
+
+    public double getDist(String id) {
+        return getNode(id).distTo;
     }
 
     public LinkedList<Node> getWay(String id) {
