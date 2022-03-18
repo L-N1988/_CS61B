@@ -8,10 +8,10 @@ import java.util.Map;
  * not draw the output correctly.
  */
 public class Rasterer {
-    private static final double UL_LON = -122.29980468;
-    private static final double LR_LON = -122.21191406;
-    private static final double LR_LAT = 37.82280243;
-    private static final double UL_LAT = 37.89219554;
+    private static final double UL_LON = MapServer.ROOT_ULLON;
+    private static final double LR_LON = MapServer.ROOT_LRLON;
+    private static final double LR_LAT = MapServer.ROOT_LRLAT;
+    private static final double UL_LAT = MapServer.ROOT_ULLAT;
     private static final double MAXLONDPP = 49.0;
     private static final double SL = 288200.0;
     private double ullon;

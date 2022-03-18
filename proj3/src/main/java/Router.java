@@ -69,8 +69,9 @@ public class Router {
         double newDist = g.getDist(curID) + g.distance(Long.parseLong(nextID), Long.parseLong(curID));
         if (g.getDist(nextID) > newDist) {
             // if priority queue does not contain next node, do nothing
+            // otherwise, pop out the node to decrease its value
             pq.remove(g.getNode(nextID));
-            // decrease distance (infinity or finite) to next node
+            // decrease previous distance (infinity or finite) to next node
             g.addEdge(curID, nextID, newDist);
             // insert node with new distance
             pq.add(g.getNode(nextID));
@@ -86,7 +87,110 @@ public class Router {
      * route.
      */
     public static List<NavigationDirection> routeDirections(GraphDB g, List<Long> route) {
-        return null; // FIXME
+        // The direction a given NavigationDirection represents.
+        int direction;
+        List<NavigationDirection> L = new LinkedList<>();
+        NavigationDirection node = new NavigationDirection();
+        long curID, nextID;
+        GraphDB.Node cur, next;
+        long start = route.get(0);
+        GraphDB.Node org;
+        g.getNode(Long.toString(start)).distTo = 0;
+
+        int turnAt = 0;
+        List<Integer> turns = new LinkedList<>();
+        turns.add(turnAt);
+
+        while (turnAt < route.size() - 1) {
+            turnAt = travelWay(turnAt, route, g);
+            turns.add(turnAt);
+        }
+
+        for (Integer turn : turns) {
+            System.out.println(g.lon(route.get(turn)) + " " + g.lat(route.get(turn)));
+        }
+
+        // calculate angel between adjacent nodes
+        for (int i = 0; i < route.size() - 1; i++) {
+            curID = route.get(i);
+            nextID = route.get(i + 1);
+            cur = g.getNode(Long.toString(curID));
+            next = g.getNode(Long.toString(nextID));
+            next.bearing = g.bearing(curID, nextID);
+            next.distTo = g.distance(curID, nextID) + cur.distTo;
+        }
+        for (int i = 1; i < route.size() - 1; i++) {
+            curID = route.get(i);
+            nextID = route.get(i + 1);
+            cur = g.getNode(Long.toString(curID));
+            next = g.getNode(Long.toString(nextID));
+            org = g.getNode(Long.toString(start));
+            direction = getDir(next.bearing - cur.bearing);
+            // change direction or change road
+            if (direction != 1 || !g.getLocation(curID).equals(g.getLocation(nextID))) {
+                node.direction = direction;
+                node.way = g.getLocation(start);
+                node.distance = next.distTo - org.distTo;
+                if (L.isEmpty()) {
+                    node.direction = 0;
+                }
+                L.add(node);
+                // System.out.println(g.lon(start) + " " + g.lat(start));
+                node = new NavigationDirection();
+                start = nextID;
+            }
+        }
+        return L;
+    }
+
+    private static int travelWay(int turnAt, List<Long> route, GraphDB g) {
+        int direction;
+        long curID, nextID;
+        GraphDB.Node cur, next;
+        // calculate angel along the way, beginning at turnAt point
+        // time complexity = O(N^2)
+        for (int i = turnAt; i < route.size() - 1; i++) {
+            curID = route.get(i);
+            nextID = route.get(i + 1);
+            next = g.getNode(Long.toString(nextID));
+            next.bearing = g.bearing(curID, nextID);
+        }
+        for (int i = turnAt + 1; i < route.size() - 1; i++) {
+            curID = route.get(i);
+            nextID = route.get(i + 1);
+            cur = g.getNode(Long.toString(curID));
+            next = g.getNode(Long.toString(nextID));
+            direction = getDir(next.bearing - cur.bearing);
+            // change direction or change road
+            if (direction != 1 || !g.getLocation(curID).equals(g.getLocation(nextID))) {
+                return i;
+            }
+        }
+        return route.size() - 1;
+    }
+
+    private static int getDir(double bearing) {
+        if (bearing > -15 && bearing < 15) {
+            return 1;
+        } else if (bearing > -30 && bearing < 30) {
+            if (bearing < 0) {
+                return 2;
+            } else {
+                return 3;
+            }
+        } else if (bearing > -100 && bearing < 100) {
+            if (bearing < 0) {
+                return 5;
+            } else {
+                return 4;
+            }
+        } else {
+            if (bearing < 0) {
+                return 6;
+            } else {
+                return 7;
+            }
+        }
     }
 
 

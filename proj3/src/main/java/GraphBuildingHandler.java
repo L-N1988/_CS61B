@@ -43,7 +43,6 @@ public class GraphBuildingHandler extends DefaultHandler {
     private final GraphDB g;
     private LinkedList<GraphDB.Node> way;
     private boolean validWay;
-    private final Map<String, String> location = new HashMap<>();
     private String id;
 
     /**
@@ -134,8 +133,7 @@ public class GraphBuildingHandler extends DefaultHandler {
             node this tag belongs to. Remember XML is parsed top-to-bottom, so probably it's the
             last node that you looked at (check the first if-case). */
             // System.out.println("Node's name: " + attributes.getValue("v"));
-            String v = attributes.getValue("v");
-            location.put(id, v);
+            g.addLocation(g.getNode(id), attributes.getValue("v"));
         }
     }
 

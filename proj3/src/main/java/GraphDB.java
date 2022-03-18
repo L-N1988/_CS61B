@@ -27,19 +27,24 @@ public class GraphDB {
     private final Map<String, Node> nodes = new HashMap<>();
 
     static class Node implements Comparable {
-        String id;
-        String lat;
-        String lon;
+        private final String id;
+        private final String lat;
+        private final String lon;
+        private String location;
         Node prev;
         double distTo;
         double heuristic;
+        double bearing;
 
         Node(String id, String lat, String lon, double distTo) {
             this.id = id;
             this.lat = lat;
             this.lon = lon;
+            location = "unknown road";
             prev = null;
             this.distTo = distTo;
+            heuristic = Double.MAX_VALUE;
+            bearing = 0;
         }
 
         @Override
@@ -108,6 +113,14 @@ public class GraphDB {
         Node next = getNode(nextID);
         next.prev = getNode(curId);
         next.distTo = distTo;
+    }
+
+    public void addLocation(Node n, String loc) {
+        n.location = loc;
+    }
+
+    public String getLocation(long id) {
+        return getNode(Long.toString(id)).location;
     }
 
     public double getDist(String id) {
