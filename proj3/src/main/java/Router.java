@@ -61,12 +61,15 @@ public class Router {
     private static void resetAllNodes(GraphDB g, GraphDB.Node dest) {
         for (Long id : g.vertices()) {
             g.addEdge(null, Long.toString(id), Double.MAX_VALUE);
-            g.getNode(Long.toString(id)).heuristic = g.distance(id, Long.parseLong(g.getNodeID(dest)));
+            g.getNode(Long.toString(id)).heuristic =
+                    g.distance(id, Long.parseLong(g.getNodeID(dest)));
         }
     }
 
-    private static void relax(GraphDB g, String nextID, String curID, PriorityQueue<GraphDB.Node> pq) {
-        double newDist = g.getDist(curID) + g.distance(Long.parseLong(nextID), Long.parseLong(curID));
+    private static void relax(GraphDB g, String nextID, String curID,
+                              PriorityQueue<GraphDB.Node> pq) {
+        double newDist = g.getDist(curID)
+                + g.distance(Long.parseLong(nextID), Long.parseLong(curID));
         if (g.getDist(nextID) > newDist) {
             // if priority queue does not contain next node, do nothing
             // otherwise, pop out the node to decrease its value
@@ -87,108 +90,79 @@ public class Router {
      * route.
      */
     public static List<NavigationDirection> routeDirections(GraphDB g, List<Long> route) {
-        // The direction a given NavigationDirection represents.
-        int direction;
-        List<NavigationDirection> L = new LinkedList<>();
-        NavigationDirection node = new NavigationDirection();
-        long curID, nextID;
-        GraphDB.Node cur, next;
-        long start = route.get(0);
-        GraphDB.Node org;
-        g.getNode(Long.toString(start)).distTo = 0;
-
-        int turnAt = 0;
-        List<Integer> turns = new LinkedList<>();
-        turns.add(turnAt);
-
-        while (turnAt < route.size() - 1) {
-            turnAt = travelWay(turnAt, route, g);
-            turns.add(turnAt);
-        }
-
-        for (Integer turn : turns) {
-            System.out.println(g.lon(route.get(turn)) + " " + g.lat(route.get(turn)));
-        }
-
-        // calculate angel between adjacent nodes
-        for (int i = 0; i < route.size() - 1; i++) {
-            curID = route.get(i);
-            nextID = route.get(i + 1);
-            cur = g.getNode(Long.toString(curID));
-            next = g.getNode(Long.toString(nextID));
-            next.bearing = g.bearing(curID, nextID);
-            next.distTo = g.distance(curID, nextID) + cur.distTo;
-        }
+        LinkedList<NavigationDirection> L = new LinkedList<>();
+        NavigationDirection cur = new NavigationDirection();
+        cur.direction = NavigationDirection.START;
+        cur.distance += g.distance(route.get(0), route.get(1));
+        cur.way = currentWayName(route.get(0), route.get(1), g);
         for (int i = 1; i < route.size() - 1; i++) {
-            curID = route.get(i);
-            nextID = route.get(i + 1);
-            cur = g.getNode(Long.toString(curID));
-            next = g.getNode(Long.toString(nextID));
-            org = g.getNode(Long.toString(start));
-            direction = getDir(next.bearing - cur.bearing);
-            // change direction or change road
-            if (direction != 1 || !g.getLocation(curID).equals(g.getLocation(nextID))) {
-                node.direction = direction;
-                node.way = g.getLocation(start);
-                node.distance = next.distTo - org.distTo;
-                if (L.isEmpty()) {
-                    node.direction = 0;
-                }
-                L.add(node);
-                // System.out.println(g.lon(start) + " " + g.lat(start));
-                node = new NavigationDirection();
-                start = nextID;
+            // reach the turning point
+            if (!currentWayName(route.get(i), route.get(i + 1), g).equals(cur.way)) {
+                // System.out.println(g.lon(route.get(i)) + " " + g.lat(route.get(i)));
+                L.add(cur);
+                System.out.println(g.getNodeID(g.getNode(Long.toString(route.get(i)))));
+                // search next way
+                cur = new NavigationDirection();
+                double prevBearing = g.bearing(route.get(i - 1), route.get(i));
+                double curBearing = g.bearing(route.get(i), route.get(i + 1));
+                cur.direction = getDir(curBearing - prevBearing);
+                // default distance is 0.0, therefore it restarts calculate distance
+                cur.distance += g.distance(route.get(i), route.get(i + 1));
+                cur.way = currentWayName(route.get(i), route.get(i + 1), g);
+                // do not calculate distance again
+                continue;
             }
+            cur.distance += g.distance(route.get(i), route.get(i + 1));
         }
+        L.add(cur);
         return L;
     }
 
-    private static int travelWay(int turnAt, List<Long> route, GraphDB g) {
-        int direction;
-        long curID, nextID;
-        GraphDB.Node cur, next;
-        // calculate angel along the way, beginning at turnAt point
-        // time complexity = O(N^2)
-        for (int i = turnAt; i < route.size() - 1; i++) {
-            curID = route.get(i);
-            nextID = route.get(i + 1);
-            next = g.getNode(Long.toString(nextID));
-            next.bearing = g.bearing(curID, nextID);
-        }
-        for (int i = turnAt + 1; i < route.size() - 1; i++) {
-            curID = route.get(i);
-            nextID = route.get(i + 1);
-            cur = g.getNode(Long.toString(curID));
-            next = g.getNode(Long.toString(nextID));
-            direction = getDir(next.bearing - cur.bearing);
-            // change direction or change road
-            if (direction != 1 || !g.getLocation(curID).equals(g.getLocation(nextID))) {
-                return i;
-            }
-        }
-        return route.size() - 1;
+    // must get name from id, instead of store way name directly
+    // because two node can share same way name, but has different way id
+    // aka, the way is broken to two parts in some sense
+    private static String currentWayName(Long cur, Long next, GraphDB g) {
+        return g.getWayName(currentWayID(cur, next, g));
     }
 
-    private static int getDir(double bearing) {
-        if (bearing > -15 && bearing < 15) {
-            return 1;
-        } else if (bearing > -30 && bearing < 30) {
-            if (bearing < 0) {
-                return 2;
-            } else {
-                return 3;
+    private static String currentWayID(Long cur, Long next, GraphDB g) {
+        LinkedList<String> curWayIDs = g.getWayID(cur);
+        LinkedList<String> nextWayIDs = g.getWayID(next);
+        // assuming all street's turning points are recoded
+        for (String wayID : curWayIDs) {
+            if (nextWayIDs.contains(wayID)) {
+                return wayID;
             }
-        } else if (bearing > -100 && bearing < 100) {
+        }
+        return "";
+    }
+
+    // get direction basing on relative bearing
+    private static int getDir(double bearing) {
+        if (bearing < -180.0) {
+            bearing += 360.0;
+        } else if (bearing > 180) {
+            bearing -= 360.0;
+        }
+        if (bearing >= -15 && bearing <= 15) {
+            return NavigationDirection.STRAIGHT;
+        } else if (bearing >= -30 && bearing <= 30) {
             if (bearing < 0) {
-                return 5;
+                return NavigationDirection.SLIGHT_LEFT;
             } else {
-                return 4;
+                return NavigationDirection.SLIGHT_RIGHT;
+            }
+        } else if (bearing >= -100 && bearing <= 100) {
+            if (bearing < 0) {
+                return NavigationDirection.LEFT;
+            } else {
+                return NavigationDirection.RIGHT;
             }
         } else {
             if (bearing < 0) {
-                return 6;
+                return NavigationDirection.SHARP_LEFT;
             } else {
-                return 7;
+                return NavigationDirection.SHARP_RIGHT;
             }
         }
     }

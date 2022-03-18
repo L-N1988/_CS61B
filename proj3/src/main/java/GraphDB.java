@@ -21,30 +21,32 @@ import javax.xml.parsers.SAXParserFactory;
  * @author Alan Yao, Josh Hug
  */
 public class GraphDB {
-    /** Your instance variables for storing the graph. You should consider
-     * creating helper classes, e.g. Node, Edge, etc. */
-    private Map<String, LinkedList<Node>> graph = new HashMap<>();
+    // chaining list to represent graph, string is node's id, list is connected nodes
+    private final Map<String, LinkedList<Node>> graph = new HashMap<>();
+    // store all node's info, including id, lon, lat, location
     private final Map<String, Node> nodes = new HashMap<>();
+    // store all way's info, including nodes, name, highway, max speed?
+    private final Map<String, Way> ways = new HashMap<>();
 
     static class Node implements Comparable {
         private final String id;
         private final String lat;
         private final String lon;
         private String location;
+        private final LinkedList<String> wayID;
         Node prev;
         double distTo;
         double heuristic;
-        double bearing;
 
         Node(String id, String lat, String lon, double distTo) {
             this.id = id;
             this.lat = lat;
             this.lon = lon;
-            location = "unknown road";
+            location = null;
             prev = null;
             this.distTo = distTo;
             heuristic = Double.MAX_VALUE;
-            bearing = 0;
+            wayID = new LinkedList<>();
         }
 
         @Override
@@ -69,6 +71,23 @@ public class GraphDB {
         public int compareTo(Object o) {
             Node other = (Node) o;
             return Double.compare(this.distTo + this.heuristic, other.distTo + other.heuristic);
+        }
+    }
+
+    static class Way {
+        private LinkedList<Node> nodes;
+        private String wayID;
+        private String name;
+        private String highway;
+        private String maxSpeed;
+
+        Way(LinkedList<Node> nd, String wayID,
+                   String name, String highway, String maxSpeed) {
+            nodes = nd;
+            this.wayID = wayID;
+            this.name = name;
+            this.highway = highway;
+            this.maxSpeed = maxSpeed;
         }
     }
 
@@ -115,12 +134,31 @@ public class GraphDB {
         next.distTo = distTo;
     }
 
-    public void addLocation(Node n, String loc) {
-        n.location = loc;
+    public void addRecordedWay(LinkedList<Node> nd, String wayID,
+                               String name, String highway, String maxSpeed) {
+        ways.put(wayID, new Way(nd, wayID, name, highway, maxSpeed));
+        for (Node item : nd) {
+            if (!item.wayID.contains(wayID)) {
+                item.wayID.add(wayID);
+            }
+        }
     }
 
-    public String getLocation(long id) {
-        return getNode(Long.toString(id)).location;
+    // return ways' id, which cross the node, id is node's id
+    public LinkedList<String> getWayID(long id) {
+        return getNode(Long.toString(id)).wayID;
+    }
+
+    public String getWayName(String wayID) {
+        return ways.get(wayID).name;
+    }
+
+    public LinkedList<Node> getWayNode(String wayID) {
+        return ways.get(wayID).nodes;
+    }
+
+    public void addLocation(Node n, String loc) {
+        n.location = loc;
     }
 
     public double getDist(String id) {

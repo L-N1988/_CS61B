@@ -2,9 +2,7 @@ import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
-import java.util.HashMap;
 import java.util.LinkedList;
-import java.util.Map;
 import java.util.Set;
 import java.util.HashSet;
 import java.util.Arrays;
@@ -42,8 +40,12 @@ public class GraphBuildingHandler extends DefaultHandler {
     private String activeState = "";
     private final GraphDB g;
     private LinkedList<GraphDB.Node> way;
+    private String wayName;
+    private String maxSpeed;
+    private String highway;
     private boolean validWay;
     private String id;
+    private String wayID;
 
     /**
      * Create a new GraphBuildingHandler.
@@ -90,14 +92,18 @@ public class GraphBuildingHandler extends DefaultHandler {
         } else if (qName.equals("way")) {
             /* We encountered a new <way...> tag. */
             activeState = "way";
+            wayID = attributes.getValue("id");
             // System.out.println("Beginning a way...");
+            // update all variables about way to read in next way
             way = new LinkedList<>();
+            wayName = "";
+            maxSpeed = "";
+            highway = "";
             validWay = false;
         } else if (activeState.equals("way") && qName.equals("nd")) {
             /* While looking at a way, we found a <nd...> tag. */
             // System.out.println("Id of a node in this way: " + attributes.getValue("ref"));
 
-            /* TODO Use the above id to make "possible" connections between the nodes in this way */
             /* Hint1: It would be useful to remember what was the last node in this way. */
             /* Hint2: Not all ways are valid. So, directly connecting the nodes here would be
             cumbersome since you might have to remove the connections if you later see a tag that
@@ -113,22 +119,23 @@ public class GraphBuildingHandler extends DefaultHandler {
             String v = attributes.getValue("v");
             if (k.equals("maxspeed")) {
                 // System.out.println("Max Speed: " + v);
-                /* TODO set the max speed of the "current way" here. */
+                maxSpeed = v;
             } else if (k.equals("highway")) {
                 // System.out.println("Highway type: " + v);
                 // valid only if it is a “highway” AND
                 // it is one of the ALLOWED_HIGHWAY_TYPES
+                highway = v;
                 if (ALLOWED_HIGHWAY_TYPES.contains(v)) {
                     validWay = true;
                 }
             } else if (k.equals("name")) {
                 // System.out.println("Way Name: " + v);
+                wayName = v;
             }
             // System.out.println("Tag with k=" + k + ", v=" + v + ".");
         } else if (activeState.equals("node") && qName.equals("tag") && attributes.getValue("k")
                 .equals("name")) {
             /* While looking at a node, we found a <tag...> with k="name". */
-            /* TODO Create a location. */
             /* Hint: Since we found this <tag...> INSIDE a node, we should probably remember which
             node this tag belongs to. Remember XML is parsed top-to-bottom, so probably it's the
             last node that you looked at (check the first if-case). */
@@ -154,7 +161,9 @@ public class GraphBuildingHandler extends DefaultHandler {
             /* We are done looking at a way. (We finished looking at the nodes, speeds, etc...)*/
             /* Hint1: If you have stored the possible connections for this way, here's your
             chance to actually connect the nodes together if the way is valid. */
+            // store all way information
             if (validWay) {
+                g.addRecordedWay(way, wayID, wayName, highway, maxSpeed);
                 LinkedList<GraphDB.Node> oldWay;
                 int index = 1;
                 for (GraphDB.Node item : way) {
