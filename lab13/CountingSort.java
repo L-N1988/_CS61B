@@ -1,3 +1,5 @@
+import java.util.Arrays;
+
 /**
  * Class with 2 ways of doing Counting sort, one naive way and one "better" way
  *
@@ -62,38 +64,117 @@ public class CountingSort {
      * Note, this code does not need to work for ranges of numbers greater
      * than 2 billion.
      * Does not touch original array (non-destructive method).
+     * use radix sort of string to treat integer number overflow
      *
      * @param arr int array that will be sorted
      */
     public static int[] betterCountingSort(int[] arr) {
-        int max = Integer.MIN_VALUE;
-        int min = Integer.MAX_VALUE;
+        int[] tmp = new int[arr.length];
+        int[] posArr;
+        int[] negArr;
+        int negativeIndex = -1;
+        int positiveIndex = arr.length;
         for (int item : arr) {
-            max = (max < item) ? item : max;
-            min = (min > item) ? item : min;
+            if (item < 0) {
+                negativeIndex += 1;
+                tmp[negativeIndex] = -1 * item;
+            } else {
+                positiveIndex -= 1;
+                tmp[positiveIndex] = item;
+            }
         }
-        // if min is non-negative, case is same as naive counting sort
-        min = (min > 0) ? 0 : min;
-        int len = (max - min) + 1;
-        int[] cnt = new int[len];
-        // count every item's occurrence
-        for (int item : arr) {
-            cnt[item - min] += 1;
+        posArr = new int[arr.length - 1 - negativeIndex];
+        negArr = new int[negativeIndex + 1];
+        if (positiveIndex == arr.length) {
+            // only negative items
+            System.arraycopy(tmp, 0, negArr, 0, negArr.length);
+        } else if (negativeIndex == -1) {
+            // only positive items
+            System.arraycopy(tmp, positiveIndex, posArr, 0, posArr.length);
+        } else {
+            System.arraycopy(tmp, 0, negArr, 0, negArr.length);
+            System.arraycopy(tmp, positiveIndex, posArr, 0, posArr.length);
         }
-        // count item's start position
-        int pos = 0;
-        int[] start = new int[cnt.length];
-        for (int i = 0; i < cnt.length; i++) {
-            start[i] = pos;
-            pos += cnt[i];
+        // ascending
+        int[] positiveSort = betterCountingSortHelper(posArr);
+        // descending (item is positive actually, so it should reverse order matching ascending
+        int[] negativeSort = betterCountingSortHelper(negArr);
+        for (int i = 0; i < tmp.length; i++) {
+            if (i > negativeIndex) {
+                // set positive item to the right end
+                tmp[i] = positiveSort[i - negativeIndex - 1];
+            } else {
+                // reverse negative item
+                tmp[i] = -1 * negativeSort[negativeIndex - i];
+            }
         }
-        // rearrange numbers based on the number's start position
+        return tmp;
+    }
+
+    private static int[] betterCountingSortHelper(int[] arr) {
+        if (arr.length == 0) {
+            return arr;
+        }
+        String[] asciis = new String[arr.length];
         int[] sorted = new int[arr.length];
         for (int i = 0; i < arr.length; i++) {
-            int startPos = start[arr[i] - min];
-            sorted[startPos] = arr[i];
-            start[arr[i] - min] += 1;
+            asciis[i] = Integer.toString(arr[i]);
+        }
+        int maxStringLen = 0;
+        for (String ascii : asciis) {
+            maxStringLen = Math.max(maxStringLen, ascii.length());
+        }
+        String[] sameLenStr = new String[asciis.length];
+        // uniform all strings' length by padding them on the right
+        // padding uses white space
+        for (int i = 0; i < asciis.length; i++) {
+            // add leading zeros
+            StringBuilder padStr = new StringBuilder("0".repeat(Math.max(0, maxStringLen - asciis[i].length())));
+            sameLenStr[i] = padStr + asciis[i];
+        }
+        for (int i = 0; i < maxStringLen; i++) {
+            // the lest significant digit has the most significant position
+            sortHelperLSD(sameLenStr, maxStringLen - 1 - i);
+        }
+        for (int i = 0; i < asciis.length; i++) {
+            sorted[i] = Integer.parseInt(sameLenStr[i]);
         }
         return sorted;
+    }
+
+
+    /**
+     * LSD helper method that performs a destructive counting sort the array of
+     * Strings based off characters at a specific index.
+     * @param asciis Input array of Strings
+     * @param index The position to sort the Strings on.
+     */
+    private static void sortHelperLSD(String[] asciis, int index) {
+        int[] count = new int[256];
+        for (int i = 0; i < asciis.length; i++) {
+            int val = asciis[i].charAt(index);
+            count[val] += 1;
+        }
+        int[] start = new int[256];
+        int pos = 0;
+        for (int i = 0; i < count.length; i++) {
+            start[i] = pos;
+            pos += count[i];
+        }
+        String[] sorted = new String[asciis.length];
+        for (int i = 0; i < asciis.length; i++) {
+            String item = asciis[i];
+            int startPos = start[item.charAt(index)];
+            sorted[startPos] = item;
+            start[item.charAt(index)] += 1;
+        }
+        System.arraycopy(sorted, 0, asciis, 0, sorted.length);
+    }
+
+    public static void main(String[] args) {
+        int[] nonNegative = {2147483647, 5, 2, 1, 5, 3, 0, 3, 1, 1};
+        System.out.println(Arrays.toString(nonNegative));
+        int[] sorted = betterCountingSort(nonNegative);
+        System.out.println(Arrays.toString(sorted));
     }
 }

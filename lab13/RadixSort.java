@@ -23,6 +23,7 @@ public class RadixSort {
             maxStringLen = Math.max(maxStringLen, ascii.length());
         }
         String[] sameLenStr = new String[asciis.length];
+        String[] sameLenStr2 = new String[asciis.length];
         // uniform all strings' length by padding them on the right
         // padding uses white space
         for (int i = 0; i < asciis.length; i++) {
@@ -79,7 +80,7 @@ public class RadixSort {
      *
      **/
     private static void sortHelperMSD(String[] asciis, int start, int end, int index) {
-        // Optional MSD helper method for optional MSD radix sort
+
         return;
     }
 
