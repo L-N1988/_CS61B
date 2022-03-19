@@ -65,6 +65,7 @@ public class CountingSort {
      * than 2 billion.
      * Does not touch original array (non-destructive method).
      * use radix sort of string to treat integer number overflow
+     * but too slowwwwwwwwwwwwwww!!!!!!!!!!
      *
      * @param arr int array that will be sorted
      */
@@ -129,7 +130,8 @@ public class CountingSort {
         // padding uses white space
         for (int i = 0; i < asciis.length; i++) {
             // add leading zeros
-            StringBuilder padStr = new StringBuilder("0".repeat(Math.max(0, maxStringLen - asciis[i].length())));
+            StringBuilder padStr =
+                    new StringBuilder("0".repeat(Math.max(0, maxStringLen - asciis[i].length())));
             sameLenStr[i] = padStr + asciis[i];
         }
         for (int i = 0; i < maxStringLen; i++) {

@@ -19,37 +19,18 @@ public class RadixSort {
      */
     public static String[] sort(String[] asciis) {
         int maxStringLen = 0;
+        String[] sameLenStr = new String[asciis.length];
+        System.arraycopy(asciis, 0, sameLenStr, 0, asciis.length);
         for (String ascii : asciis) {
             maxStringLen = Math.max(maxStringLen, ascii.length());
         }
-        String[] sameLenStr = new String[asciis.length];
-        // uniform all strings' length by padding them on the right
-        // padding uses white space
-        for (int i = 0; i < asciis.length; i++) {
-            // the minimal ascii code
-            char pad = 0;
-            StringBuilder padStr = new StringBuilder();
-            padStr.append(String.valueOf(pad).repeat(Math.max(0, Math.max(0, maxStringLen - asciis[i].length()))));
-            sameLenStr[i] = asciis[i] + padStr;
-        }
+        // do not uniform all strings' length by padding them on the right using any code
+        // instead extend count array to store char occurrence using original string length
         for (int i = 0; i < maxStringLen; i++) {
             // the lest significant digit has the most significant position
             sortHelperLSD(sameLenStr, maxStringLen - 1 - i);
         }
-        for (int i = 0; i < sameLenStr.length; i++) {
-            sameLenStr[i] = cleanString(sameLenStr[i]);
-        }
         return sameLenStr;
-    }
-
-    private static String cleanString(String s) {
-        StringBuilder str = new StringBuilder();
-        for (int i = 0; i < s.length(); i++) {
-            if (s.charAt(i) != 0) {
-                str.append(s.charAt(i));
-            }
-        }
-        return str.toString();
     }
 
     /**
@@ -59,25 +40,33 @@ public class RadixSort {
      * @param index The position to sort the Strings on.
      */
     private static void sortHelperLSD(String[] asciis, int index) {
-        int[] count = new int[256];
+        // extend one position array to store missing part of shorter string
+        int[] count = new int[256 + 1];
         for (int i = 0; i < asciis.length; i++) {
-            int val = asciis[i].charAt(index);
+            int val = charOrNone(index, asciis[i]);
             count[val] += 1;
         }
-        int[] start = new int[256];
+        int[] start = new int[256 + 1];
         int pos = 0;
-        for (int i = 0; i < count.length; i++) {
+        for (int i = 0; i < start.length; i++) {
             start[i] = pos;
             pos += count[i];
         }
         String[] sorted = new String[asciis.length];
         for (int i = 0; i < asciis.length; i++) {
             String item = asciis[i];
-            int startPos = start[item.charAt(index)];
+            int startPos = start[charOrNone(index, item)];
             sorted[startPos] = item;
-            start[item.charAt(index)] += 1;
+            start[charOrNone(index, item)] += 1;
         }
         System.arraycopy(sorted, 0, asciis, 0, sorted.length);
+    }
+
+    private static int charOrNone(int i, String ascii) {
+        if (i < ascii.length()) {
+            return ascii.charAt(i) + 1;
+        }
+        return 0;
     }
 
     /**
@@ -91,7 +80,6 @@ public class RadixSort {
      *
      **/
     private static void sortHelperMSD(String[] asciis, int start, int end, int index) {
-
         return;
     }
 
