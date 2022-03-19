@@ -23,22 +23,33 @@ public class RadixSort {
             maxStringLen = Math.max(maxStringLen, ascii.length());
         }
         String[] sameLenStr = new String[asciis.length];
-        String[] sameLenStr2 = new String[asciis.length];
         // uniform all strings' length by padding them on the right
         // padding uses white space
         for (int i = 0; i < asciis.length; i++) {
-            StringBuilder padStr = new StringBuilder(asciis[i]);
-            padStr.append(" ".repeat(Math.max(0, maxStringLen - asciis[i].length())));
-            sameLenStr[i] = padStr.toString();
+            // the minimal ascii code
+            char pad = 0;
+            StringBuilder padStr = new StringBuilder();
+            padStr.append(String.valueOf(pad).repeat(Math.max(0, Math.max(0, maxStringLen - asciis[i].length()))));
+            sameLenStr[i] = asciis[i] + padStr;
         }
         for (int i = 0; i < maxStringLen; i++) {
             // the lest significant digit has the most significant position
             sortHelperLSD(sameLenStr, maxStringLen - 1 - i);
         }
         for (int i = 0; i < sameLenStr.length; i++) {
-            sameLenStr[i] = sameLenStr[i].strip();
+            sameLenStr[i] = cleanString(sameLenStr[i]);
         }
         return sameLenStr;
+    }
+
+    private static String cleanString(String s) {
+        StringBuilder str = new StringBuilder();
+        for (int i = 0; i < s.length(); i++) {
+            if (s.charAt(i) != 0) {
+                str.append(s.charAt(i));
+            }
+        }
+        return str.toString();
     }
 
     /**
