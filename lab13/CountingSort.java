@@ -176,7 +176,12 @@ public class CountingSort {
     public static void main(String[] args) {
         int[] nonNegative = {2147483647, 5, 2, 1, 5, 3, 0, 3, 1, 1};
         System.out.println(Arrays.toString(nonNegative));
+
+        final long startTime = System.currentTimeMillis();
         int[] sorted = betterCountingSort(nonNegative);
+        final long endTime = System.currentTimeMillis();
+        System.out.println("Total execution time: " + (endTime - startTime));
+
         System.out.println(Arrays.toString(sorted));
     }
 }
