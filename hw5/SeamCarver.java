@@ -1,6 +1,7 @@
 import edu.princeton.cs.algs4.Picture;
 
 import java.awt.Color;
+import java.util.Arrays;
 
 public class SeamCarver {
     int width;
@@ -92,48 +93,72 @@ public class SeamCarver {
     }
 
     // find vertical seam actually
+    // algorithm works like folding paper from top row by row until the bottom
     private int[] findSeam(int width, int height, int flag) {
-        int[] Seam = new int[height];
-        int[] prevSeam = new int[height];
-        double minCost = Double.MAX_VALUE;
-        double cost;
-        for (int x = 0; x < width; x++) {
-            int y = 0;
-            prevSeam[y] = x;
-            cost = energy(x, y, flag);
-            // explore next row
-            y += 1;
-            while (y < height) {
-                prevSeam[y] = minEnergyV(prevSeam[y - 1], y, flag);
-                cost += energy(prevSeam[y], y, flag);
-                y += 1;
-            }
-            if (cost < minCost) {
-                minCost = cost;
-                System.arraycopy(prevSeam, 0, Seam, 0, height);
+        int[] seam = new int[height];
+        double[][] accEnergy = new double[height][width];
+        int[][] from = new int[height][width];
+        // set all value to max to prepare to find minimal
+        for (int i = 0; i < width; i++) {
+            for (int j = 0; j < height; j++) {
+                accEnergy[j][i] = Double.MAX_VALUE;
             }
         }
-        return Seam;
+        // initialize the first row
+        for (int i = 0; i < width; i++) {
+            accEnergy[0][i] = energy(i, 0, flag);
+            from[0][i] = i;
+        }
+        int y = 1;
+        int minCol;
+        while (y < height) {
+            for (int i = 0; i < width; i++) {
+                // return minimal accumulative energy
+                minCol = minAccEnergyV(i, y - 1, accEnergy);
+                if (accEnergy[y][i] > energy(i, y, flag) + accEnergy[y - 1][minCol]) {
+                    // store from column
+                    from[y][i] = minCol;
+                    // decrease energy
+                    accEnergy[y][i] = energy(i, y, flag) + accEnergy[y - 1][minCol];
+                }
+            }
+            y += 1;
+        }
+        minCol = 0;
+        // find minimal cost accumulating energy in the last row
+        for (int i = 0; i < width; i++) {
+            if (accEnergy[height - 1][minCol] > accEnergy[height - 1][i]) {
+                minCol = i;
+            }
+        }
+        seam[height - 1] = minCol;
+        // verbose but beautiful
+        for (int i = 0; i < height - 1; i++) {
+            int prevCol = from[height - 1 - i][seam[height - 1 - i]];
+            seam[height - 2 - i] = prevCol;
+        }
+        return seam;
     }
 
-    /**
-     * explore y row associate with x col to find minimal cost column
-     * @param x, column
-     * @param y, searching row
-     * @return minimal cost's column
-     */
-    private int minEnergyV(int x, int y, int flag) {
+    private int minAccEnergyV(int x, int y, double[][] accEnergy) {
         int minX;
-        if (energy(x, y, flag) > energy(x + 1, y, flag)) {
+        if (accEnergy(x, y, accEnergy) > accEnergy(x + 1, y, accEnergy)) {
             minX = x + 1;
         } else {
             minX = x;
         }
-        if (energy(minX, y, flag) > energy(x - 1, y ,flag)) {
+        if (accEnergy(minX, y, accEnergy) > accEnergy(x - 1, y, accEnergy)) {
             return x - 1;
         } else {
             return minX;
         }
+    }
+
+    private double accEnergy(int x, int y, double[][] accEnergy) {
+        if (x < 0 || x >= accEnergy[0].length || y < 0 || y >= accEnergy.length) {
+            return Double.MAX_VALUE;
+        }
+        return accEnergy[y][x];
     }
 
     // remove horizontal seam from picture
