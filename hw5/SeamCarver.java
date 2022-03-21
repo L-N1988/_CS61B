@@ -1,23 +1,22 @@
 import edu.princeton.cs.algs4.Picture;
 
 import java.awt.Color;
-import java.util.Arrays;
 
 public class SeamCarver {
-    int width;
-    int height;
-    double[][] energy;
-    double[][] reverseEnergy;
-    Picture currentPic;
+    private int picWidth;
+    private int picHeight;
+    private double[][] energy;
+    private double[][] reverseEnergy;
+    private Picture currentPic;
 
     public SeamCarver(Picture picture) {
-        currentPic = picture;
-        width = picture.width();
-        height = picture.height();
-        energy = new double[height][width];
-        reverseEnergy = new double[width][height];
-        for (int x = 0; x < width; x++) {
-            for (int y = 0; y < height; y++) {
+        currentPic = new Picture(picture.width(), picture.height());
+        picWidth = picture.width();
+        picHeight = picture.height();
+        energy = new double[picHeight][picWidth];
+        reverseEnergy = new double[picWidth][picHeight];
+        for (int x = 0; x < picWidth; x++) {
+            for (int y = 0; y < picHeight; y++) {
                 energy[y][x] = calcEnergy(x, y, picture);
                 reverseEnergy[x][y] = energy[y][x];
             }
@@ -27,10 +26,10 @@ public class SeamCarver {
     private double calcEnergy(int x, int y, Picture picture) {
         double deltaXSR;
         double deltaYSR;
-        int upRow = (y - 1 < 0) ? height - 1: y - 1;
-        int lowRow = (y + 1 < height) ? y + 1 : 0;
-        int rightCol = (x + 1 < width) ? x + 1 : 0;
-        int leftCol = (x - 1 < 0) ? width - 1 : x - 1;
+        int upRow = (y - 1 < 0) ? picHeight - 1 : y - 1;
+        int lowRow = (y + 1 < picHeight) ? y + 1 : 0;
+        int rightCol = (x + 1 < picWidth) ? x + 1 : 0;
+        int leftCol = (x - 1 < 0) ? picWidth - 1 : x - 1;
         Color up = picture.get(x, upRow);
         Color low = picture.get(x, lowRow);
         Color right = picture.get(rightCol, y);
@@ -51,14 +50,14 @@ public class SeamCarver {
 
     // width of current picture
     public int width() {
-        width = currentPic.width();
-        return width;
+        picWidth = currentPic.width();
+        return picWidth;
     }
 
     // height of current picture
     public int height() {
-        height = currentPic.height();
-        return height;
+        picHeight = currentPic.height();
+        return picHeight;
     }
 
     // energy of pixel at column x and row y
@@ -68,12 +67,12 @@ public class SeamCarver {
 
     private double energy(int x, int y, int flag) {
         if (flag == 0) {
-            if (x < 0 || x >= width || y < 0 || y >= height) {
+            if (x < 0 || x >= picWidth || y < 0 || y >= picHeight) {
                 return Double.MAX_VALUE;
             }
             return energy[y][x];
         } else {
-            if (x < 0 || x >= height || y < 0 || y >= width) {
+            if (x < 0 || x >= picHeight || y < 0 || y >= picWidth) {
                 return Double.MAX_VALUE;
             }
             return reverseEnergy[y][x];
@@ -84,12 +83,12 @@ public class SeamCarver {
     public int[] findHorizontalSeam() {
         // reverse height and width to generate proper array
         // using flag == 1 to return reversed energy map
-        return findSeam(height, width, 1);
+        return findSeam(picHeight, picWidth, 1);
     }
 
     // sequence of indices for vertical seam
     public int[] findVerticalSeam() {
-        return findSeam(width, height, 0);
+        return findSeam(picWidth, picHeight, 0);
     }
 
     // find vertical seam actually
@@ -163,12 +162,12 @@ public class SeamCarver {
 
     // remove horizontal seam from picture
     public void removeHorizontalSeam(int[] seam) {
-        SeamRemover.removeHorizontalSeam(currentPic, seam);
+        currentPic = SeamRemover.removeHorizontalSeam(currentPic, seam);
     }
 
     // remove vertical seam from picture
     public void removeVerticalSeam(int[] seam) {
-        SeamRemover.removeHorizontalSeam(currentPic, seam);
+        currentPic = SeamRemover.removeVerticalSeam(currentPic, seam);
     }
 
 }
