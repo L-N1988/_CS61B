@@ -10,7 +10,7 @@ public class SeamCarver {
     private Picture currentPic;
 
     public SeamCarver(Picture picture) {
-        currentPic = new Picture(picture.width(), picture.height());
+        currentPic = new Picture(picture);
         picWidth = picture.width();
         picHeight = picture.height();
         energy = new double[picHeight][picWidth];
@@ -45,7 +45,7 @@ public class SeamCarver {
 
     // current picture
     public Picture picture() {
-        return currentPic;
+        return new Picture(currentPic);
     }
 
     // width of current picture
@@ -162,12 +162,12 @@ public class SeamCarver {
 
     // remove horizontal seam from picture
     public void removeHorizontalSeam(int[] seam) {
-        currentPic = SeamRemover.removeHorizontalSeam(currentPic, seam);
+        SeamRemover.removeHorizontalSeam(currentPic, seam);
     }
 
     // remove vertical seam from picture
     public void removeVerticalSeam(int[] seam) {
-        currentPic = SeamRemover.removeVerticalSeam(currentPic, seam);
+        SeamRemover.removeVerticalSeam(currentPic, seam);
     }
 
 }
