@@ -1,5 +1,3 @@
-import edu.princeton.cs.algs4.MinPQ;
-
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Map;
@@ -32,7 +30,7 @@ public class Trie {
 
     // put string into trie
     public void put(String key) {
-        if (key == null) {
+        if (key == null || key.length() == 0) {
             return;
         }
         put(key, root, 0);
@@ -46,10 +44,11 @@ public class Trie {
         char c = s.charAt(index);
         Node next = root.links.get(c);
         if (next == null) {
-            root.links.put(c, new Node());
+            next = new Node();
+            root.links.put(c, next);
         }
         if (index == s.length() - 1) {
-            root.exist = true;
+            next.exist = true;
             n += 1;
         }
         put(s, next, index + 1);
@@ -80,11 +79,24 @@ public class Trie {
         Queue<String> queue = new LinkedList<>();
         Node start;
         if (prefix == null || prefix.length() == 0) {
-            return null;
+            return queue.iterator();
         }
         start = downAlongPrefix(prefix, root, 0);
         collect(start, new StringBuilder(prefix), queue);
         return queue.iterator();
+    }
+
+    private Node downAlongPrefix(String prefix, Node root, int index) {
+        char c = prefix.charAt(index);
+        Node next = root.links.get(c);
+        if (next == null) {
+            return null;
+        } else {
+            if (index == prefix.length() - 1) {
+                return next;
+            }
+            return downAlongPrefix(prefix, next, index + 1);
+        }
     }
 
     private void collect(Node start, StringBuilder prefix, Queue<String> queue) {
@@ -97,7 +109,7 @@ public class Trie {
             prefix.append(c);
             // dfs search trie
             collect(next, prefix, queue);
-            if (start.exist) {
+            if (next.exist) {
                 queue.offer(prefix.toString());
             }
             // pop stack and shift backwards
@@ -105,16 +117,4 @@ public class Trie {
         }
     }
 
-    private Node downAlongPrefix(String prefix, Node root, int index) {
-        char c = prefix.charAt(index);
-        Node next = root.links.get(c);
-        if (next == null) {
-            return null;
-        } else {
-            if (index == prefix.length() - 1) {
-                return next;
-            }
-            return downAlongPrefix(prefix, root, index + 1);
-        }
-    }
 }
