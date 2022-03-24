@@ -75,15 +75,15 @@ public class Trie {
         }
     }
 
-    public Iterator<String> keyWithPrefix(String prefix) {
+    public Queue<String> keyWithPrefix(String prefix) {
         Queue<String> queue = new LinkedList<>();
         Node start;
         if (prefix == null || prefix.length() == 0) {
-            return queue.iterator();
+            return queue;
         }
         start = downAlongPrefix(prefix, root, 0);
         collect(start, new StringBuilder(prefix), queue);
-        return queue.iterator();
+        return queue;
     }
 
     private Node downAlongPrefix(String prefix, Node root, int index) {

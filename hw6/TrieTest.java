@@ -23,8 +23,7 @@ public class TrieTest {
             String s = in.readString();
             assertTrue(trie.contains(s));
         }
-        for (Iterator<String> it = trie.keyWithPrefix("po"); it.hasNext(); ) {
-            String s = it.next();
+        for (String s : trie.keyWithPrefix("la")) {
             System.out.println(s);
         }
     }
