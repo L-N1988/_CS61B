@@ -9,21 +9,21 @@ public class Boggle {
         int x;
         int y;
 
-        public Position(int x, int y) {
+        Position(int x, int y) {
             this.x = x;
             this.y = y;
         }
     }
 
-    private static class myString implements Comparable<myString> {
+    private static class MyString implements Comparable<MyString> {
         String str;
 
-        public myString(String str) {
+        MyString(String str) {
             this.str = str;
         }
 
         @Override
-        public int compareTo(myString o) {
+        public int compareTo(MyString o) {
             // reverse compare function, make length max string in the peek of priority queue
             int cmp = -1 * Integer.compare(this.str.length(), o.str.length());
             if (cmp == 0) {
@@ -35,11 +35,11 @@ public class Boggle {
     }
     
     // File path of dictionary file
-    static String dictPath = "words.txt";
-    static Trie trie = new Trie();
-    static String[] board;
-    static String[][] pathBoard;
-    static boolean[][] marked;
+    private static String dictPath = "trivial_words.txt";
+    private static Trie trie = new Trie();
+    private static String[] board;
+    private static boolean[][] marked;
+
     /**
      * Solves a Boggle puzzle.
      * 
@@ -54,15 +54,17 @@ public class Boggle {
         int height = 0;
         int width;
         In in = new In(dictPath);
-        MinPQ<myString> pq = new MinPQ<>();
+        MinPQ<MyString> pq = new MinPQ<>();
         List<String> ret = new LinkedList<>();
         // read in all dict words
         while (!in.isEmpty()) {
             String s = in.readString();
             trie.put(s);
         }
+        // count board strings number
         in = new In(boardFilePath);
         while (!in.isEmpty()) {
+            in.readString();
             height += 1;
         }
         board = new String[height];
@@ -74,66 +76,46 @@ public class Boggle {
             height += 1;
         }
         width = board[0].length();
-        pathBoard = new String[height][width];
         marked = new boolean[height][width];
         for (int i = 0; i < width; i++) {
             for (int j = 0; j < height; j++) {
-                clearBoard();
-                boardBFS(i, j, pq);
+                boardDFS(i, j, new StringBuilder(), pq);
             }
         }
         // poll k max length words from pq
-        for (int i = 0; i < k; i++) {
+        for (int i = 0; i < k;) {
             if (pq.isEmpty()) {
                 break;
             }
-            ret.add(pq.delMin().str);
+            String item = pq.delMin().str;
+            if (!ret.contains(item)) {
+                ret.add(item);
+                i += 1;
+            }
         }
         return ret;
     }
 
-    private static void clearBoard() {
-        for (int j = 0; j < board.length; j++) {
-            for (int i = 0; i < board[0].length(); i++) {
-                marked[j][i] = false;
-                pathBoard[j][i] = String.valueOf(board[j].charAt(i));
-            }
-        }
-    }
-
-    private static void boardBFS(int x, int y, MinPQ<myString> pq) {
-        // enqueue all possible words in pq
-        Queue<Position> queue = new LinkedList<>();
-        Position cur = new Position(x, y);
-        char c;
-        queue.offer(cur);
-        marked[y][x] = true;
-        while (!queue.isEmpty()) {
-            cur = queue.poll();
-            c = board[cur.y].charAt(cur.x);
-            StringBuilder str = new StringBuilder(pathBoard[cur.y][cur.x]);
+    private static void boardDFS(int x, int y, StringBuilder s, MinPQ<MyString> pq) {
+        if (!marked[y][x]) {
+            // non-destruct way to use string builder object
+            StringBuilder str = new StringBuilder(s);
+            str.append(board[y].charAt(x));
+            marked[y][x] = true;
             if (str.length() >= 3 && trie.contains(str.toString())) {
-                pq.insert(new myString(str.toString()));
+                pq.insert(new MyString(str.toString()));
             }
-            for (Position next : adjacent(cur.x, cur.y, c)) {
-                queue.offer(next);
-                str.append(board[next.y].charAt(next.x));
-                pathBoard[next.y][next.x] = str.toString();
-                marked[next.y][next.x] = true;
+            for (Position next : adjacent(x, y, str.toString())) {
+                boardDFS(next.x, next.y, str, pq);
             }
+            // when pop recursion stack, clear up marked along the way
+            marked[y][x] = false;
         }
     }
 
     // horizontal, vertical and diagonal
-    private static Set<Position> adjacent(int x, int y, char c) {
-        int toRight = 0;
-        int toLeft = 0;
-        int toUp = 0;
-        int toDown = 0;
-        int upRight = 0;
-        int upLeft = 0;
-        int downRight = 0;
-        int downLeft = 0;
+    private static Set<Position> adjacent(int x, int y, String c) {
+        int toRight, toLeft, toUp, toDown, upRight, upLeft, downRight, downLeft;
         Set<Position> dir = new HashSet<>();
         StringBuilder right = new StringBuilder();
         StringBuilder left = new StringBuilder();

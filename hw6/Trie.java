@@ -1,4 +1,3 @@
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Map;
 import java.util.HashMap;
@@ -63,6 +62,9 @@ public class Trie {
     }
 
     private boolean contains(String key, Node root, int index) {
+        if (index >= key.length()) {
+            return false;
+        }
         char c = key.charAt(index);
         Node next = root.links.get(c);
         if (next == null) {
@@ -80,6 +82,10 @@ public class Trie {
         Node start;
         if (prefix == null || prefix.length() == 0) {
             return queue;
+        }
+        // prefix is the exact word itself
+        if (contains(prefix)) {
+            queue.offer(prefix);
         }
         start = downAlongPrefix(prefix, root, 0);
         collect(start, new StringBuilder(prefix), queue);
