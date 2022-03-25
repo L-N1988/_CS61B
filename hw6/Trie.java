@@ -92,6 +92,15 @@ public class Trie {
         return queue;
     }
 
+    public boolean hasPrefix(String prefix) {
+        Node start;
+        if (prefix == null || prefix.length() == 0) {
+            return false;
+        }
+        start = downAlongPrefix(prefix, root, 0);
+        return start != null;
+    }
+
     private Node downAlongPrefix(String prefix, Node cur, int index) {
         char c = prefix.charAt(index);
         Node next = cur.links.get(c);

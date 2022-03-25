@@ -117,77 +117,60 @@ public class Boggle {
 
     // horizontal, vertical and diagonal
     private static Set<Position> adjacent(int x, int y, String c) {
-        int toRight, toLeft, toUp, toDown, upRight, upLeft, downRight, downLeft;
         Set<Position> dir = new HashSet<>();
-        StringBuilder right = new StringBuilder();
-        StringBuilder left = new StringBuilder();
-        StringBuilder up = new StringBuilder();
-        StringBuilder down = new StringBuilder();
-        StringBuilder upR = new StringBuilder();
-        StringBuilder upL = new StringBuilder();
-        StringBuilder downR = new StringBuilder();
-        StringBuilder downL = new StringBuilder();
-        right.append(c);
-        left.append(c);
-        up.append(c);
-        down.append(c);
-        upR.append(c);
-        upL.append(c);
-        downR.append(c);
-        downL.append(c);
+        StringBuilder right = new StringBuilder(c);
+        StringBuilder left = new StringBuilder(c);
+        StringBuilder up = new StringBuilder(c);
+        StringBuilder down = new StringBuilder(c);
+        StringBuilder upR = new StringBuilder(c);
+        StringBuilder upL = new StringBuilder(c);
+        StringBuilder downR = new StringBuilder(c);
+        StringBuilder downL = new StringBuilder(c);
         if (x + 1 < board[0].length() && y - 1 >= 0 && !marked[y - 1][x + 1]) {
             upR.append(board[y - 1].charAt(x + 1));
-            upRight = trie.keyWithPrefix(upR.toString()).size();
-            if (upRight > 0) {
+            if (trie.hasPrefix(upR.toString())) {
                 dir.add(new Position(x + 1, y - 1));
             }
         }
         if (x - 1 >= 0 && y - 1 >= 0 && !marked[y - 1][x - 1]) {
             upL.append(board[y - 1].charAt(x - 1));
-            upLeft = trie.keyWithPrefix(upL.toString()).size();
-            if (upLeft > 0) {
+            if (trie.hasPrefix(upL.toString())) {
                 dir.add(new Position(x - 1, y - 1));
             }
         }
         if (x - 1 >= 0 && y + 1 < board.length && !marked[y + 1][x - 1]) {
             downL.append(board[y + 1].charAt(x - 1));
-            downLeft = trie.keyWithPrefix(downL.toString()).size();
-            if (downLeft > 0) {
+            if (trie.hasPrefix(downL.toString())) {
                 dir.add(new Position(x - 1, y + 1));
             }
         }
         if (x + 1 < board[0].length() && y + 1 < board.length && !marked[y + 1][x + 1]) {
             downR.append(board[y + 1].charAt(x + 1));
-            downRight = trie.keyWithPrefix(downR.toString()).size();
-            if (downRight > 0) {
+            if (trie.hasPrefix(downR.toString())) {
                 dir.add(new Position(x + 1, y + 1));
             }
         }
         if (x + 1 < board[0].length() && !marked[y][x + 1]) {
             right.append(board[y].charAt(x + 1));
-            toRight = trie.keyWithPrefix(right.toString()).size();
-            if (toRight > 0) {
+            if (trie.hasPrefix(right.toString())) {
                 dir.add(new Position(x + 1, y));
             }
         }
         if (x - 1 >= 0 && !marked[y][x - 1]) {
             left.append(board[y].charAt(x - 1));
-            toLeft = trie.keyWithPrefix(left.toString()).size();
-            if (toLeft > 0) {
+            if (trie.hasPrefix(left.toString())) {
                 dir.add(new Position(x - 1, y));
             }
         }
         if (y + 1 < board.length && !marked[y + 1][x]) {
             down.append(board[y + 1].charAt(x));
-            toDown = trie.keyWithPrefix(down.toString()).size();
-            if (toDown > 0) {
+            if (trie.hasPrefix(down.toString())) {
                 dir.add(new Position(x, y + 1));
             }
         }
         if (y - 1 >= 0 && !marked[y - 1][x]) {
             up.append(board[y - 1].charAt(x));
-            toUp = trie.keyWithPrefix(up.toString()).size();
-            if (toUp > 0) {
+            if (trie.hasPrefix(up.toString())) {
                 dir.add(new Position(x, y - 1));
             }
         }
