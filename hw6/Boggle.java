@@ -37,7 +37,7 @@ public class Boggle {
     }
     
     // File path of dictionary file
-    private static String dictPath = "words.txt";
+    static String dictPath = "words.txt";
     private static Trie trie = new Trie();
     private static String[] board;
     private static boolean[][] marked;
