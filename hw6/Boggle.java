@@ -1,8 +1,10 @@
 import edu.princeton.cs.algs4.In;
 import edu.princeton.cs.algs4.MinPQ;
 
-import java.util.*;
-
+import java.util.HashSet;
+import java.util.List;
+import java.util.LinkedList;
+import java.util.Set;
 
 public class Boggle {
     private static class Position {
@@ -35,7 +37,7 @@ public class Boggle {
     }
     
     // File path of dictionary file
-    private static String dictPath = "trivial_words.txt";
+    private static String dictPath = "words.txt";
     private static Trie trie = new Trie();
     private static String[] board;
     private static boolean[][] marked;

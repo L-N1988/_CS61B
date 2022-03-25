@@ -11,7 +11,7 @@ public class Trie {
         boolean exist;
         Map<Character, Node> links;
 
-        public Node() {
+        Node() {
             exist = false;
             links = new HashMap<>();
         }
@@ -36,15 +36,15 @@ public class Trie {
     }
 
     // most worlds' sizes are not longer than 20, so recursion is safe
-    private void put(String s, Node root, int index) {
+    private void put(String s, Node cur, int index) {
         if (index >= s.length()) {
             return;
         }
         char c = s.charAt(index);
-        Node next = root.links.get(c);
+        Node next = cur.links.get(c);
         if (next == null) {
             next = new Node();
-            root.links.put(c, next);
+            cur.links.put(c, next);
         }
         if (index == s.length() - 1) {
             next.exist = true;
@@ -61,12 +61,12 @@ public class Trie {
         return contains(key, root, 0);
     }
 
-    private boolean contains(String key, Node root, int index) {
+    private boolean contains(String key, Node cur, int index) {
         if (index >= key.length()) {
             return false;
         }
         char c = key.charAt(index);
-        Node next = root.links.get(c);
+        Node next = cur.links.get(c);
         if (next == null) {
             return false;
         } else {
@@ -92,9 +92,9 @@ public class Trie {
         return queue;
     }
 
-    private Node downAlongPrefix(String prefix, Node root, int index) {
+    private Node downAlongPrefix(String prefix, Node cur, int index) {
         char c = prefix.charAt(index);
-        Node next = root.links.get(c);
+        Node next = cur.links.get(c);
         if (next == null) {
             return null;
         } else {

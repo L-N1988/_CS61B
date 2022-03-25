@@ -16,7 +16,7 @@ public class TrieTest {
             cnt += 1;
             trie.put(s);
         }
-        System.out.format("%d words have been put in trie!%n" ,trie.size());
+        System.out.format("%d words have been put in trie!%n", trie.size());
         assertEquals(cnt, trie.size());
         in = new In(dictPath);
         while (!in.isEmpty()) {
