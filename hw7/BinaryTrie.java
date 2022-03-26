@@ -7,13 +7,13 @@ import java.util.Map;
 public class BinaryTrie implements Serializable {
     Node root;
 
-    private class Node implements Comparable<Node> {
+    private class Node implements Comparable<Node>, Serializable {
         char ch;
         int freq;
         Node left;
         Node right;
 
-        public Node(char ch, int freq, Node left, Node right) {
+        Node(char ch, int freq, Node left, Node right) {
             this.ch = ch;
             this.freq = freq;
             this.left = left;
@@ -67,14 +67,15 @@ public class BinaryTrie implements Serializable {
     }
 
     // postorder traverse, but only act on leaf nodes
-    private void buildLookupTableHelper(Node cur, BitSequence bits, Map<Character,BitSequence> map) {
+    private void buildLookupTableHelper(Node cur, BitSequence bits,
+                                        Map<Character, BitSequence> map) {
         if (cur == null) {
             return;
         }
         buildLookupTableHelper(cur.left, bits.appended(0), map);
         buildLookupTableHelper(cur.right, bits.appended(1), map);
-        // bits append uses a non-destruct way implementation, so bits in this method does not change
-        // only input leaf nodes in trie
+        // bits append uses a non-destruct way implementation,
+        // so bits in this method does not change. only input leaf nodes in trie
         if (cur.left == null && cur.right == null) {
             map.put(cur.ch, bits);
         }
