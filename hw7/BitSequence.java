@@ -185,7 +185,7 @@ public class BitSequence implements Serializable {
     public String toString() {
         StringBuilder sb = new StringBuilder();
         for (int i = 0; i < length(); i += 1) {
-            sb.append(String.valueOf(bitAt(i)));
+            sb.append(bitAt(i));
         }
         return sb.toString();
     }

@@ -4,8 +4,8 @@ import java.util.TreeSet;
 public class ObjectWritingAndReadingDemo {
 
     public static void main(String[] args) {
-        ArrayList<Integer> integerList = new ArrayList<Integer>();
-        TreeSet<String> stringSet = new TreeSet<String>();
+        ArrayList<Integer> integerList = new ArrayList<>();
+        TreeSet<String> stringSet = new TreeSet<>();
 
         integerList.add(5);
         integerList.add(10);
