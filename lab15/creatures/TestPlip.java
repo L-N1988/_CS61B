@@ -1,16 +1,16 @@
 package creatures;
+import huglife.Action;
+import huglife.Impassible;
+import huglife.Direction;
+import huglife.Occupant;
+import huglife.Empty;
 import org.junit.Test;
 import static org.junit.Assert.*;
 import java.util.HashMap;
 import java.awt.Color;
-import huglife.Direction;
-import huglife.Action;
-import huglife.Occupant;
-import huglife.Impassible;
-import huglife.Empty;
 
 /** Tests the plip class   
- *  @authr FIXME
+ *  @authr matrix
  */
 
 public class TestPlip {
@@ -36,25 +36,30 @@ public class TestPlip {
 
     @Test
     public void testReplicate() {
-
+        Plip p = new Plip(2);
+        double expected = 2;
+        Plip offspring = p.replicate();
+        expected *= 0.5;
+        assertEquals(expected, p.energy(), 0.01);
+        assertNotSame(p, offspring);
     }
 
-    //@Test
+    @Test
     public void testChoose() {
         Plip p = new Plip(1.2);
-        HashMap<Direction, Occupant> surrounded = new HashMap<Direction, Occupant>();
+        HashMap<Direction, Occupant> surrounded = new HashMap<>();
         surrounded.put(Direction.TOP, new Impassible());
         surrounded.put(Direction.BOTTOM, new Impassible());
         surrounded.put(Direction.LEFT, new Impassible());
         surrounded.put(Direction.RIGHT, new Impassible());
 
-        //You can create new empties with new Empty();
-        //Despite what the spec says, you cannot test for Cloruses nearby yet.
-        //Sorry!  
-
         Action actual = p.chooseAction(surrounded);
         Action expected = new Action(Action.ActionType.STAY);
+        assertEquals(expected, actual);
 
+        surrounded.put(Direction.RIGHT, new Empty());
+        actual = p.chooseAction(surrounded);
+        expected = new Action(Action.ActionType.REPLICATE, Direction.RIGHT);
         assertEquals(expected, actual);
     }
 

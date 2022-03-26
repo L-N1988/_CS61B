@@ -62,7 +62,7 @@ public class HugLifeAnimator {
             Process process = pb.start();
             BufferedReader inStreamReader = new BufferedReader(new InputStreamReader(process.getInputStream()));
             String s;
-            while((s = inStreamReader.readLine()) != null){
+            while ((s = inStreamReader.readLine()) != null) {
                 System.out.println(s);
             }
             System.out.println("Wrote GIF in " + System.getProperty("user.dir"));

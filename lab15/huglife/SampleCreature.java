@@ -81,7 +81,7 @@ public class SampleCreature extends Creature {
      *  NEIGHBORS:
      *  1. If surrounded on three sides, move into the empty space.
      *  2. Otherwise, if there are any empty spaces, move into one of them with
-     *     probabiltiy given by moveProbability.
+     *     probability given by moveProbability.
      *  3. Otherwise, stay.
      *
      *  Returns the action selected.

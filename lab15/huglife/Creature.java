@@ -50,7 +50,7 @@ public abstract class Creature extends Occupant {
         Direction.LEFT */
     public List<Direction> getNeighborsOfType(Map<Direction, Occupant> n,
                                               String type) {
-        List<Direction> L = new ArrayList<Direction>();
+        List<Direction> L = new ArrayList<>();
         for (Map.Entry<Direction, Occupant> entry : n.entrySet()) {
             String occupantName = entry.getValue().name();
             if (occupantName.equals(type)) {
